@@ -27,7 +27,8 @@ impl Imports for ElementSpec {
     {
         match *self {
             ElementSpec::Elements(ref elements) => receiver.import_all(elements),
-            ElementSpec::Statement(ref statement) => statement.imports(receiver),
+            ElementSpec::Push(ref statement) => statement.imports(receiver),
+            ElementSpec::Concat(ref statement) => statement.imports(receiver),
             ElementSpec::Nested(ref nested) => {
                 (*nested).imports(receiver);
             }

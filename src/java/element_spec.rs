@@ -1,13 +1,23 @@
 use super::annotation_spec::AnnotationSpec;
 use super::class_spec::ClassSpec;
 use super::elements::Elements;
+use super::enum_spec::EnumSpec;
 use super::interface_spec::InterfaceSpec;
 use super::method_spec::MethodSpec;
 use super::statement::{AsStatement, Statement};
 
+pub trait ElementFormat {
+    fn push(&mut self, value: &str);
+
+    fn concat(&mut self, value: &str);
+}
+
 #[derive(Debug, Clone)]
 pub enum ElementSpec {
-    Statement(Statement),
+    // push as individual line.
+    Push(Statement),
+    // concat to previous statement.
+    Concat(Statement),
     Literal(String),
     Elements(Vec<ElementSpec>),
     Nested(Box<ElementSpec>),
@@ -15,33 +25,36 @@ pub enum ElementSpec {
 }
 
 impl ElementSpec {
-    pub fn format(&self, current: &str, indent: &str) -> Vec<String> {
-        let mut out = Vec::new();
-
+    pub fn format<E>(&self, current: &str, indent: &str, out: &mut E)
+        where E: ElementFormat
+    {
         match *self {
-            ElementSpec::Statement(ref statement) => {
+            ElementSpec::Push(ref statement) => {
                 for line in statement.format(0usize) {
-                    out.push(format!("{}{}", current, line));
+                    out.push(&format!("{}{}", current, line));
+                }
+            }
+            ElementSpec::Concat(ref statement) => {
+                for line in statement.format(0usize) {
+                    out.concat(&line);
                 }
             }
             ElementSpec::Literal(ref line) => {
-                out.push(format!("{}{}", current, line));
+                out.push(&format!("{}{}", current, line));
             }
             ElementSpec::Elements(ref elements) => {
                 for element in elements {
-                    out.extend(element.format(current, indent));
+                    element.format(current, indent, out)
                 }
             }
             ElementSpec::Nested(ref element) => {
                 let next_current = format!("{}{}", current, indent);
-                out.extend(element.format(&next_current, indent));
+                element.format(&next_current, indent, out)
             }
             ElementSpec::Spacing => {
-                out.push("".to_owned());
+                out.push("");
             }
         };
-
-        out
     }
 }
 
@@ -71,7 +84,7 @@ impl AsElementSpec for ElementSpec {
 
 impl AsElementSpec for Statement {
     fn as_element_spec(self) -> ElementSpec {
-        ElementSpec::Statement(self)
+        ElementSpec::Push(self)
     }
 }
 
@@ -234,6 +247,92 @@ impl AsElementSpec for AnnotationSpec {
         } else {
             elements.push(annotation);
         }
+
+        elements.as_element_spec()
+    }
+}
+
+impl AsElementSpec for EnumSpec {
+    fn as_element_spec(self) -> ElementSpec {
+        let mut elements = Elements::new();
+
+        for a in &self.annotations {
+            elements.push(a);
+        }
+
+        // opening statement
+        {
+            let mut open = Statement::new();
+
+            if !self.modifiers.is_empty() {
+                open.push(self.modifiers);
+                open.push(" ");
+            }
+
+            open.push("enum ");
+            open.push(&self.name);
+
+            if !self.implements.is_empty() {
+                let mut arguments = Statement::new();
+
+                for implements in &self.implements {
+                    arguments.push(implements);
+                }
+
+                open.push(" implements ");
+                open.push(arguments.join(","));
+            }
+
+            open.push(" {");
+
+            elements.push(open);
+        }
+
+        let mut enum_body = Elements::new();
+
+        // enum values
+        {
+            let mut values = Elements::new();
+
+            let mut value_joiner = Elements::new();
+
+            let mut comma = Statement::new();
+            comma.push(",");
+
+            value_joiner.push(ElementSpec::Concat(comma));
+
+            values.push(self.values.join(value_joiner));
+
+            let mut endl = Statement::new();
+            endl.push(";");
+
+            values.push(ElementSpec::Concat(endl));
+
+            enum_body.push(values);
+        }
+
+        if !self.fields.is_empty() {
+            let mut fields = Elements::new();
+
+            for field in &self.fields {
+                let mut field = field.as_statement();
+                field.push(";");
+                fields.push(field);
+            }
+
+            enum_body.push(fields);
+        }
+
+        for constructor in &self.constructors {
+            enum_body.push(constructor.as_element_spec(&self.name));
+        }
+
+        for element in &self.elements.elements {
+            enum_body.push(element);
+        }
+
+        elements.push_nested(enum_body.join(ElementSpec::Spacing));
+        elements.push("}");
 
         elements.as_element_spec()
     }

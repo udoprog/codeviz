@@ -1,10 +1,42 @@
 use super::_type::ClassType;
-use super::element_spec::{AsElementSpec, ElementSpec};
+use super::element_spec::{AsElementSpec, ElementFormat, ElementSpec};
 use super::elements::Elements;
 use super::imports::{Imports, ImportReceiver};
 use super::statement::Statement;
 
 use std::collections::BTreeSet;
+
+pub struct StringElementFormat {
+    buffer: String,
+}
+
+impl StringElementFormat {
+    pub fn new() -> StringElementFormat {
+        StringElementFormat { buffer: String::new() }
+    }
+
+    pub fn format(mut self) -> String {
+        if self.buffer.len() > 0 {
+            self.buffer.push('\n');
+        }
+
+        self.buffer
+    }
+}
+
+impl ElementFormat for StringElementFormat {
+    fn push(&mut self, value: &str) {
+        if self.buffer.len() > 0 {
+            self.buffer.push('\n');
+        }
+
+        self.buffer.push_str(value);
+    }
+
+    fn concat(&mut self, value: &str) {
+        self.buffer.push_str(value);
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct FileSpec {
@@ -70,14 +102,11 @@ impl FileSpec {
 
         let file = file.join(ElementSpec::Spacing).as_element_spec();
 
-        let mut out = String::new();
+        let mut out = StringElementFormat::new();
 
-        for line in file.format("", "  ") {
-            out.push_str(&line);
-            out.push('\n');
-        }
+        file.format("", "  ", &mut out);
 
-        out
+        out.format()
     }
 }
 
