@@ -62,38 +62,28 @@ pub struct LocalName {
     pub name: String,
 }
 
-pub trait AsName {
-    fn as_name(self) -> Name;
-}
-
-impl<'a, A> AsName for &'a A
-    where A: AsName + Clone
+impl<'a, T> From<&'a T> for Name
+    where T: Into<Name> + Clone
 {
-    fn as_name(self) -> Name {
-        self.clone().as_name()
+    fn from(value: &'a T) -> Name {
+        value.clone().into()
     }
 }
 
-impl AsName for Name {
-    fn as_name(self) -> Name {
-        self
+impl From<ImportedName> for Name {
+    fn from(value: ImportedName) -> Name {
+        Name::Imported(value)
     }
 }
 
-impl AsName for ImportedName {
-    fn as_name(self) -> Name {
-        Name::Imported(self)
+impl From<BuiltInName> for Name {
+    fn from(value: BuiltInName) -> Name {
+        Name::BuiltIn(value)
     }
 }
 
-impl AsName for BuiltInName {
-    fn as_name(self) -> Name {
-        Name::BuiltIn(self)
-    }
-}
-
-impl AsName for LocalName {
-    fn as_name(self) -> Name {
-        Name::Local(self)
+impl From<LocalName> for Name {
+    fn from(value: LocalName) -> Name {
+        Name::Local(value)
     }
 }

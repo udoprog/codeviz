@@ -1,6 +1,6 @@
-use super::_type::{AsType, Type};
+use super::_type::Type;
 use super::modifier::Modifiers;
-use super::statement::{AsStatement, Statement};
+use super::statement::Statement;
 
 #[derive(Debug, Clone)]
 pub struct FieldSpec {
@@ -12,37 +12,27 @@ pub struct FieldSpec {
 
 impl FieldSpec {
     pub fn new<I>(modifiers: Modifiers, ty: I, name: &str) -> FieldSpec
-        where I: AsType
+        where I: Into<Type>
     {
         FieldSpec {
             modifiers: modifiers,
-            ty: ty.as_type(),
+            ty: ty.into(),
             name: name.to_owned(),
             initialize: None,
         }
     }
 
     pub fn initialize<S>(&mut self, initialize: S)
-        where S: AsStatement
+        where S: Into<Statement>
     {
-        self.initialize = Some(initialize.as_statement());
+        self.initialize = Some(initialize.into());
     }
 }
 
-pub trait AsFieldSpec {
-    fn as_field_spec(self) -> FieldSpec;
-}
-
-impl<'a, A> AsFieldSpec for &'a A
-    where A: AsFieldSpec + Clone
+impl<'a, T> From<&'a T> for FieldSpec
+    where T: Into<FieldSpec> + Clone
 {
-    fn as_field_spec(self) -> FieldSpec {
-        self.clone().as_field_spec()
-    }
-}
-
-impl AsFieldSpec for FieldSpec {
-    fn as_field_spec(self) -> FieldSpec {
-        self
+    fn from(value: &'a T) -> FieldSpec {
+        value.clone().into()
     }
 }

@@ -1,7 +1,7 @@
-use super::decorator_spec::{AsDecoratorSpec, DecoratorSpec};
-use super::element_spec::AsElementSpec;
+use super::decorator_spec::DecoratorSpec;
+use super::element_spec::ElementSpec;
 use super::elements::Elements;
-use super::name::{AsName, Name};
+use super::name::Name;
 
 #[derive(Debug, Clone)]
 pub struct ClassSpec {
@@ -22,20 +22,20 @@ impl ClassSpec {
     }
 
     pub fn push_decorator<D>(&mut self, decorator: D)
-        where D: AsDecoratorSpec
+        where D: Into<DecoratorSpec>
     {
-        self.decorators.push(decorator.as_decorator_spec());
+        self.decorators.push(decorator.into());
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: AsElementSpec
+        where E: Into<ElementSpec>
     {
         self.elements.push(element);
     }
 
     pub fn extends<N>(&mut self, name: N)
-        where N: AsName
+        where N: Into<Name>
     {
-        self.extends.push(name.as_name());
+        self.extends.push(name.into());
     }
 }

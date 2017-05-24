@@ -1,7 +1,7 @@
-use super::decorator_spec::{AsDecoratorSpec, DecoratorSpec};
-use super::element_spec::AsElementSpec;
+use super::decorator_spec::DecoratorSpec;
+use super::element_spec::ElementSpec;
 use super::elements::Elements;
-use super::statement::{AsStatement, Statement};
+use super::statement::Statement;
 
 #[derive(Debug, Clone)]
 pub struct MethodSpec {
@@ -22,19 +22,19 @@ impl MethodSpec {
     }
 
     pub fn push_decorator<D>(&mut self, decorator: D)
-        where D: AsDecoratorSpec
+        where D: Into<DecoratorSpec>
     {
-        self.decorators.push(decorator.as_decorator_spec());
+        self.decorators.push(decorator.into());
     }
 
     pub fn push_argument<S>(&mut self, argument: S)
-        where S: AsStatement
+        where S: Into<Statement>
     {
-        self.arguments.push(argument.as_statement());
+        self.arguments.push(argument.into());
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: AsElementSpec
+        where E: Into<ElementSpec>
     {
         self.elements.push(element);
     }

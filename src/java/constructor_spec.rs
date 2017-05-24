@@ -1,6 +1,6 @@
-use super::annotation_spec::{AsAnnotationSpec, AnnotationSpec};
-use super::argument_spec::{AsArgumentSpec, ArgumentSpec};
-use super::element_spec::{AsElementSpec, ElementSpec};
+use super::annotation_spec::AnnotationSpec;
+use super::argument_spec::ArgumentSpec;
+use super::element_spec::ElementSpec;
 use super::elements::Elements;
 use super::modifier::Modifiers;
 use super::statement::Statement;
@@ -24,19 +24,19 @@ impl ConstructorSpec {
     }
 
     pub fn push_annotation<A>(&mut self, annotation: A)
-        where A: AsAnnotationSpec
+        where A: Into<AnnotationSpec>
     {
-        self.annotations.push(annotation.as_annotation_spec());
+        self.annotations.push(annotation.into());
     }
 
     pub fn push_argument<A>(&mut self, argument: A)
-        where A: AsArgumentSpec
+        where A: Into<ArgumentSpec>
     {
-        self.arguments.push(argument.as_argument_spec());
+        self.arguments.push(argument.into());
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: AsElementSpec
+        where E: Into<ElementSpec>
     {
         self.elements.push(element);
     }
@@ -64,24 +64,14 @@ impl ConstructorSpec {
         elements.push_nested(&self.elements);
         elements.push("}");
 
-        elements.as_element_spec()
+        elements.into()
     }
 }
 
-pub trait AsConstructorSpec {
-    fn as_constructor_spec(self) -> ConstructorSpec;
-}
-
-impl<'a, A> AsConstructorSpec for &'a A
-    where A: AsConstructorSpec + Clone
+impl<'a, T> From<&'a T> for ConstructorSpec
+    where T: Into<ConstructorSpec> + Clone
 {
-    fn as_constructor_spec(self) -> ConstructorSpec {
-        self.clone().as_constructor_spec()
-    }
-}
-
-impl AsConstructorSpec for ConstructorSpec {
-    fn as_constructor_spec(self) -> ConstructorSpec {
-        self
+    fn from(value: &'a T) -> ConstructorSpec {
+        value.clone().into()
     }
 }

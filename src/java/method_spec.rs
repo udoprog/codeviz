@@ -1,7 +1,7 @@
-use super::_type::{AsType, Type};
-use super::annotation_spec::{AsAnnotationSpec, AnnotationSpec};
-use super::argument_spec::{AsArgumentSpec, ArgumentSpec};
-use super::element_spec::AsElementSpec;
+use super::_type::Type;
+use super::annotation_spec::AnnotationSpec;
+use super::argument_spec::ArgumentSpec;
+use super::element_spec::ElementSpec;
 use super::elements::Elements;
 use super::modifier::Modifiers;
 
@@ -28,25 +28,25 @@ impl MethodSpec {
     }
 
     pub fn push_annotation<A>(&mut self, annotation: A)
-        where A: AsAnnotationSpec
+        where A: Into<AnnotationSpec>
     {
-        self.annotations.push(annotation.as_annotation_spec());
+        self.annotations.push(annotation.into());
     }
 
     pub fn push_argument<A>(&mut self, argument: A)
-        where A: AsArgumentSpec
+        where A: Into<ArgumentSpec>
     {
-        self.arguments.push(argument.as_argument_spec());
+        self.arguments.push(argument.into());
     }
 
     pub fn returns<T>(&mut self, returns: T)
-        where T: AsType
+        where T: Into<Type>
     {
-        self.returns = Some(returns.as_type())
+        self.returns = Some(returns.into())
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: AsElementSpec
+        where E: Into<ElementSpec>
     {
         self.elements.push(element);
     }

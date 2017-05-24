@@ -1,5 +1,5 @@
-use super::name::{AsName, Name, BuiltInName, ImportedName};
-use super::statement::{AsStatement, Statement};
+use super::name::{Name, BuiltInName, ImportedName};
+use super::statement::Statement;
 
 #[derive(Debug, Clone)]
 pub struct DecoratorSpec {
@@ -9,47 +9,37 @@ pub struct DecoratorSpec {
 
 impl DecoratorSpec {
     pub fn new<N>(name: N) -> DecoratorSpec
-        where N: AsName
+        where N: Into<Name>
     {
         DecoratorSpec {
-            name: name.as_name(),
+            name: name.into(),
             arguments: Vec::new(),
         }
     }
 
     pub fn push_argument<S>(&mut self, statement: S)
-        where S: AsStatement
+        where S: Into<Statement>
     {
-        self.arguments.push(statement.as_statement());
+        self.arguments.push(statement.into());
     }
 }
 
-pub trait AsDecoratorSpec {
-    fn as_decorator_spec(self) -> DecoratorSpec;
-}
-
-impl<'a, A> AsDecoratorSpec for &'a A
-    where A: AsDecoratorSpec + Clone
+impl<'a, T> From<&'a T> for DecoratorSpec
+    where T: Into<DecoratorSpec> + Clone
 {
-    fn as_decorator_spec(self) -> DecoratorSpec {
-        self.clone().as_decorator_spec()
+    fn from(value: &'a T) -> DecoratorSpec {
+        value.clone().into()
     }
 }
 
-impl AsDecoratorSpec for DecoratorSpec {
-    fn as_decorator_spec(self) -> DecoratorSpec {
-        self
+impl From<BuiltInName> for DecoratorSpec {
+    fn from(value: BuiltInName) -> DecoratorSpec {
+        DecoratorSpec::new(value)
     }
 }
 
-impl AsDecoratorSpec for BuiltInName {
-    fn as_decorator_spec(self) -> DecoratorSpec {
-        DecoratorSpec::new(self.as_name())
-    }
-}
-
-impl AsDecoratorSpec for ImportedName {
-    fn as_decorator_spec(self) -> DecoratorSpec {
-        DecoratorSpec::new(self.as_name())
+impl From<ImportedName> for DecoratorSpec {
+    fn from(value: ImportedName) -> DecoratorSpec {
+        DecoratorSpec::new(value)
     }
 }

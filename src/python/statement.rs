@@ -1,4 +1,4 @@
-use super::variable::{AsVariable, Variable};
+use super::variable::Variable;
 
 fn python_quote_string(input: &str) -> String {
     let mut out = String::new();
@@ -35,34 +35,17 @@ impl Statement {
     }
 
     pub fn push<V>(&mut self, variable: V)
-        where V: AsVariable
+        where V: Into<Variable>
     {
-        self.parts.push(variable.as_variable());
-    }
-
-    pub fn push_arguments<S, A>(&mut self, arguments: &Vec<S>, separator: A)
-        where S: AsStatement + Clone,
-              A: AsVariable + Clone
-    {
-        if arguments.is_empty() {
-            return;
-        }
-
-        let mut out: Statement = Statement::new();
-
-        for a in arguments {
-            out.push(a.as_statement());
-        }
-
-        self.push(out.join(separator));
+        self.parts.push(variable.into());
     }
 
     pub fn join<A>(self, separator: A) -> Statement
-        where A: AsVariable + Clone
+        where A: Into<Variable> + Clone
     {
         let mut it = self.parts.into_iter();
 
-        let part = match it.next() {
+        let part: Variable = match it.next() {
             Some(part) => part,
             None => return Statement::new(),
         };
@@ -73,7 +56,7 @@ impl Statement {
         let sep = &separator;
 
         while let Some(part) = it.next() {
-            parts.push(sep.as_variable());
+            parts.push(sep.into());
             parts.push(part);
         }
 
@@ -114,32 +97,22 @@ impl Statement {
     }
 }
 
-pub trait AsStatement {
-    fn as_statement(self) -> Statement;
-}
-
-impl<'a, A> AsStatement for &'a A
-    where A: AsStatement + Clone
+impl<'a, T> From<&'a T> for Statement
+    where T: Into<Statement> + Clone
 {
-    fn as_statement(self) -> Statement {
-        self.clone().as_statement()
+    fn from(value: &'a T) -> Statement {
+        value.clone().into()
     }
 }
 
-impl AsStatement for Statement {
-    fn as_statement(self) -> Statement {
-        self
+impl From<Variable> for Statement {
+    fn from(value: Variable) -> Statement {
+        Statement { parts: vec![value] }
     }
 }
 
-impl AsStatement for Variable {
-    fn as_statement(self) -> Statement {
-        Statement { parts: vec![self] }
-    }
-}
-
-impl AsStatement for String {
-    fn as_statement(self) -> Statement {
-        Statement { parts: vec![Variable::Literal(self)] }
+impl From<String> for Statement {
+    fn from(value: String) -> Statement {
+        Statement { parts: vec![Variable::Literal(value)] }
     }
 }

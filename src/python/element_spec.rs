@@ -44,82 +44,72 @@ impl ElementSpec {
     }
 }
 
-pub trait AsElementSpec {
-    fn as_element_spec(self) -> ElementSpec;
-}
-
-impl<'a, A> AsElementSpec for &'a A
-    where A: AsElementSpec + Clone
+impl<'a, T> From<&'a T> for ElementSpec
+    where T: Into<ElementSpec> + Clone
 {
-    fn as_element_spec(self) -> ElementSpec {
-        self.clone().as_element_spec()
+    fn from(value: &'a T) -> ElementSpec {
+        value.clone().into()
     }
 }
 
-impl<'a> AsElementSpec for &'a str {
-    fn as_element_spec(self) -> ElementSpec {
-        ElementSpec::Literal(self.to_owned())
+impl<'a> From<&'a str> for ElementSpec {
+    fn from(value: &'a str) -> ElementSpec {
+        ElementSpec::Literal(value.to_owned())
     }
 }
 
-impl AsElementSpec for ElementSpec {
-    fn as_element_spec(self) -> ElementSpec {
-        self
-    }
-}
+impl From<MethodSpec> for ElementSpec {
+    fn from(value: MethodSpec) -> ElementSpec {
+        let mut out: Vec<ElementSpec> = Vec::new();
 
-impl AsElementSpec for MethodSpec {
-    fn as_element_spec(self) -> ElementSpec {
-        let mut out = Vec::new();
-
-        for decorator in self.decorators {
-            out.push(decorator.as_element_spec());
+        for decorator in value.decorators {
+            out.push(decorator.into());
         }
 
         let mut decl = Statement::new();
         decl.push("def ");
-        decl.push(self.name);
+        decl.push(value.name);
         decl.push("(");
 
         let mut arguments = Statement::new();
 
-        for argument in self.arguments {
+        for argument in value.arguments {
             arguments.push(argument);
         }
 
         decl.push(arguments.join(", "));
         decl.push("):");
 
-        out.push(decl.as_element_spec());
+        out.push(decl.into());
 
-        if self.elements.is_empty() {
-            out.push(ElementSpec::Nested(Box::new("pass".as_element_spec())));
+        if value.elements.is_empty() {
+            out.push(ElementSpec::Nested(Box::new("pass".into())));
         } else {
-            out.push(ElementSpec::Nested(Box::new(self.elements.as_element_spec())));
+            out.push(ElementSpec::Nested(Box::new(value.elements.into())));
         }
 
         ElementSpec::Elements(out)
     }
 }
 
-impl AsElementSpec for ClassSpec {
-    fn as_element_spec(self) -> ElementSpec {
+impl From<ClassSpec> for ElementSpec {
+    fn from(value: ClassSpec) -> ElementSpec {
         let mut out = Elements::new();
 
-        for decorator in self.decorators {
+        for decorator in value.decorators {
             out.push(decorator);
         }
 
         let mut decl = Statement::new();
         decl.push("class ");
-        decl.push(self.name);
+        decl.push(value.name);
 
-        if !self.extends.is_empty() {
+        if !value.extends.is_empty() {
             decl.push("(");
 
             let mut extends = Statement::new();
 
-            for extend in self.extends {
+            for extend in value.extends {
                 extends.push(extend);
             }
 
@@ -131,40 +121,41 @@ impl AsElementSpec for ClassSpec {
 
         out.push(decl);
 
-        if self.elements.is_empty() {
+        if value.elements.is_empty() {
             out.push_nested("pass");
         } else {
-            out.push_nested(self.elements.join(ElementSpec::Spacing));
+            out.push_nested(value.elements.join(ElementSpec::Spacing));
         }
 
-        out.as_element_spec()
+        out.into()
     }
 }
 
-impl AsElementSpec for DecoratorSpec {
-    fn as_element_spec(self) -> ElementSpec {
+impl From<DecoratorSpec> for ElementSpec {
+    fn from(value: DecoratorSpec) -> ElementSpec {
         let mut decl = Statement::new();
+
         decl.push("@");
-        decl.push(self.name);
+        decl.push(value.name);
 
-        decl.as_element_spec()
+        decl.into()
     }
 }
 
-impl AsElementSpec for Statement {
-    fn as_element_spec(self) -> ElementSpec {
-        ElementSpec::Statement(self)
+impl From<Statement> for ElementSpec {
+    fn from(value: Statement) -> ElementSpec {
+        ElementSpec::Statement(value)
     }
 }
 
-impl AsElementSpec for Elements {
-    fn as_element_spec(self) -> ElementSpec {
-        ElementSpec::Elements(self.elements)
+impl From<Elements> for ElementSpec {
+    fn from(value: Elements) -> ElementSpec {
+        ElementSpec::Elements(value.elements)
     }
 }
 
-impl AsElementSpec for Vec<String> {
-    fn as_element_spec(self) -> ElementSpec {
-        ElementSpec::Elements(self.into_iter().map(ElementSpec::Literal).collect())
+impl From<Vec<String>> for ElementSpec {
+    fn from(value: Vec<String>) -> ElementSpec {
+        ElementSpec::Elements(value.into_iter().map(ElementSpec::Literal).collect())
     }
 }

@@ -1,5 +1,5 @@
 use super::annotation_spec::AnnotationSpec;
-use super::element_spec::AsElementSpec;
+use super::element_spec::ElementSpec;
 use super::elements::Elements;
 use super::modifier::Modifiers;
 
@@ -26,7 +26,7 @@ impl InterfaceSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: AsElementSpec
+        where E: Into<ElementSpec>
     {
         self.elements.push(element)
     }

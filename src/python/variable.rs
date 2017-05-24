@@ -1,5 +1,5 @@
 use super::statement::Statement;
-use super::name::{AsName, Name, ImportedName, BuiltInName};
+use super::name::{Name, ImportedName, BuiltInName, LocalName};
 
 #[derive(Debug, Clone)]
 pub enum Variable {
@@ -10,56 +10,52 @@ pub enum Variable {
     Spacing,
 }
 
-pub trait AsVariable {
-    fn as_variable(self) -> Variable;
-}
-
-impl<'a, A> AsVariable for &'a A
-    where A: AsVariable + Clone
+impl<'a, A> From<&'a A> for Variable
+    where A: Into<Variable> + Clone
 {
-    fn as_variable(self) -> Variable {
-        self.clone().as_variable()
+    fn from(value: &'a A) -> Variable {
+        value.clone().into()
     }
 }
 
-impl AsVariable for Variable {
-    fn as_variable(self) -> Variable {
-        self
+impl<'a> From<&'a str> for Variable {
+    fn from(value: &'a str) -> Variable {
+        Variable::Literal(value.to_owned())
     }
 }
 
-impl<'a> AsVariable for &'a str {
-    fn as_variable(self) -> Variable {
-        Variable::Literal(self.to_owned())
+impl From<String> for Variable {
+    fn from(value: String) -> Variable {
+        Variable::Literal(value)
     }
 }
 
-impl AsVariable for String {
-    fn as_variable(self) -> Variable {
-        Variable::Literal(self)
+impl From<Statement> for Variable {
+    fn from(value: Statement) -> Variable {
+        Variable::Statement(value)
     }
 }
 
-impl AsVariable for Statement {
-    fn as_variable(self) -> Variable {
-        Variable::Statement(self)
+impl From<Name> for Variable {
+    fn from(value: Name) -> Variable {
+        Variable::Name(value)
     }
 }
 
-impl AsVariable for Name {
-    fn as_variable(self) -> Variable {
-        Variable::Name(self)
+impl From<ImportedName> for Variable {
+    fn from(value: ImportedName) -> Variable {
+        Variable::Name(value.into())
     }
 }
 
-impl AsVariable for ImportedName {
-    fn as_variable(self) -> Variable {
-        Variable::Name(self.as_name())
+impl From<BuiltInName> for Variable {
+    fn from(value: BuiltInName) -> Variable {
+        Variable::Name(value.into())
     }
 }
 
-impl AsVariable for BuiltInName {
-    fn as_variable(self) -> Variable {
-        Variable::Name(self.as_name())
+impl From<LocalName> for Variable {
+    fn from(value: LocalName) -> Variable {
+        Variable::Name(value.into())
     }
 }

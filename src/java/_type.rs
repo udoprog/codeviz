@@ -16,9 +16,9 @@ impl ClassType {
     }
 
     pub fn with_arguments<A>(&self, arguments: Vec<A>) -> ClassType
-        where A: AsType
+        where A: Into<Type>
     {
-        let arguments = arguments.into_iter().map(AsType::as_type).collect();
+        let arguments = arguments.into_iter().map(Into::into).collect();
         ClassType::new(&self.package, &self.name, arguments)
     }
 
@@ -54,24 +54,6 @@ impl ClassType {
         }
 
         out
-    }
-}
-
-pub trait AsClassType {
-    fn as_class_type(self) -> ClassType;
-}
-
-impl<'a, A> AsClassType for &'a A
-    where A: AsClassType + Clone
-{
-    fn as_class_type(self) -> ClassType {
-        self.clone().as_class_type()
-    }
-}
-
-impl AsClassType for ClassType {
-    fn as_class_type(self) -> ClassType {
-        self
     }
 }
 
@@ -147,40 +129,38 @@ impl Type {
     }
 }
 
-pub trait AsType {
-    fn as_type(self) -> Type;
-}
-
-impl<'a, A> AsType for &'a A
-    where A: AsType + Clone
+impl<'a, T> From<&'a T> for ClassType
+    where T: Into<ClassType> + Clone
 {
-    fn as_type(self) -> Type {
-        self.clone().as_type()
+    fn from(value: &'a T) -> ClassType {
+        value.clone().into()
     }
 }
 
-impl AsType for Type {
-    fn as_type(self) -> Type {
-        self
+impl<'a, A> From<&'a A> for Type
+    where A: Into<Type> + Clone
+{
+    fn from(value: &'a A) -> Type {
+        value.clone().into()
     }
 }
 
 /// Implementation for ClassType to Type conversion.
-impl AsType for ClassType {
-    fn as_type(self) -> Type {
-        Type::Class(self)
+impl From<ClassType> for Type {
+    fn from(value: ClassType) -> Type {
+        Type::Class(value)
     }
 }
 
 /// Implementation for PrimitiveType to Type conversion.
-impl AsType for PrimitiveType {
-    fn as_type(self) -> Type {
-        Type::Primitive(self)
+impl From<PrimitiveType> for Type {
+    fn from(value: PrimitiveType) -> Type {
+        Type::Primitive(value)
     }
 }
 
-impl AsType for Local {
-    fn as_type(self) -> Type {
-        Type::Local(self)
+impl From<Local> for Type {
+    fn from(value: Local) -> Type {
+        Type::Local(value)
     }
 }

@@ -1,5 +1,5 @@
 use super::_type::ClassType;
-use super::element_spec::{AsElementSpec, ElementFormat, ElementSpec};
+use super::element_spec::{ElementFormat, ElementSpec};
 use super::elements::Elements;
 use super::imports::{Imports, ImportReceiver};
 use super::statement::Statement;
@@ -53,7 +53,7 @@ impl FileSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: AsElementSpec
+        where E: Into<ElementSpec>
     {
         self.elements.push(element);
     }
@@ -100,7 +100,7 @@ impl FileSpec {
             file.push(element);
         }
 
-        let file = file.join(ElementSpec::Spacing).as_element_spec();
+        let file: ElementSpec = file.join(ElementSpec::Spacing).into();
 
         let mut out = StringElementFormat::new();
 

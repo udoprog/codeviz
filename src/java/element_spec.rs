@@ -4,7 +4,7 @@ use super::elements::Elements;
 use super::enum_spec::EnumSpec;
 use super::interface_spec::InterfaceSpec;
 use super::method_spec::MethodSpec;
-use super::statement::{AsStatement, Statement};
+use super::statement::Statement;
 
 pub trait ElementFormat {
     fn push(&mut self, value: &str);
@@ -58,70 +58,60 @@ impl ElementSpec {
     }
 }
 
-pub trait AsElementSpec {
-    fn as_element_spec(self) -> ElementSpec;
-}
-
-impl<'a, A> AsElementSpec for &'a A
-    where A: AsElementSpec + Clone
+impl<'a, T> From<&'a T> for ElementSpec
+    where T: Into<ElementSpec> + Clone
 {
-    fn as_element_spec(self) -> ElementSpec {
-        self.clone().as_element_spec()
+    fn from(value: &'a T) -> ElementSpec {
+        value.clone().into()
     }
 }
 
-impl<'a> AsElementSpec for &'a str {
-    fn as_element_spec(self) -> ElementSpec {
-        ElementSpec::Literal(self.to_owned())
+impl<'a> From<&'a str> for ElementSpec {
+    fn from(value: &'a str) -> ElementSpec {
+        ElementSpec::Literal(value.to_owned())
     }
 }
 
-impl AsElementSpec for ElementSpec {
-    fn as_element_spec(self) -> ElementSpec {
-        self
+impl From<Statement> for ElementSpec {
+    fn from(value: Statement) -> ElementSpec {
+        ElementSpec::Push(value)
     }
 }
 
-impl AsElementSpec for Statement {
-    fn as_element_spec(self) -> ElementSpec {
-        ElementSpec::Push(self)
+impl From<Elements> for ElementSpec {
+    fn from(value: Elements) -> ElementSpec {
+        ElementSpec::Elements(value.elements)
     }
 }
 
-impl AsElementSpec for Elements {
-    fn as_element_spec(self) -> ElementSpec {
-        ElementSpec::Elements(self.elements)
+impl From<Vec<String>> for ElementSpec {
+    fn from(value: Vec<String>) -> ElementSpec {
+        ElementSpec::Elements(value.into_iter().map(ElementSpec::Literal).collect())
     }
 }
 
-impl AsElementSpec for Vec<String> {
-    fn as_element_spec(self) -> ElementSpec {
-        ElementSpec::Elements(self.into_iter().map(ElementSpec::Literal).collect())
-    }
-}
-
-impl AsElementSpec for ClassSpec {
-    fn as_element_spec(self) -> ElementSpec {
+impl From<ClassSpec> for ElementSpec {
+    fn from(value: ClassSpec) -> ElementSpec {
         let mut elements = Elements::new();
 
-        for a in &self.annotations {
+        for a in &value.annotations {
             elements.push(a);
         }
 
         let mut open = Statement::new();
 
-        if !self.modifiers.is_empty() {
-            open.push(self.modifiers);
+        if !value.modifiers.is_empty() {
+            open.push(value.modifiers);
             open.push(" ");
         }
 
         open.push("class ");
-        open.push(&self.name);
+        open.push(&value.name);
 
-        if !self.implements.is_empty() {
+        if !value.implements.is_empty() {
             let mut arguments = Statement::new();
 
-            for implements in &self.implements {
+            for implements in &value.implements {
                 arguments.push(implements);
             }
 
@@ -137,45 +127,45 @@ impl AsElementSpec for ClassSpec {
 
         let mut fields = Elements::new();
 
-        for field in &self.fields {
-            let mut field = field.as_statement();
+        for field in &value.fields {
+            let mut field: Statement = field.into();
             field.push(";");
             fields.push(field);
         }
 
         class_body.push(fields);
 
-        for constructor in &self.constructors {
-            class_body.push(constructor.as_element_spec(&self.name));
+        for constructor in &value.constructors {
+            class_body.push(constructor.as_element_spec(&value.name));
         }
 
-        for element in &self.elements.elements {
+        for element in &value.elements.elements {
             class_body.push(element);
         }
 
         elements.push_nested(class_body.join(ElementSpec::Spacing));
         elements.push("}");
 
-        elements.as_element_spec()
+        elements.into()
     }
 }
 
-impl AsElementSpec for MethodSpec {
-    fn as_element_spec(self) -> ElementSpec {
+impl From<MethodSpec> for ElementSpec {
+    fn from(value: MethodSpec) -> ElementSpec {
         let mut elements = Elements::new();
 
-        for a in &self.annotations {
+        for a in &value.annotations {
             elements.push(a);
         }
 
         let mut open = Statement::new();
 
-        if !self.modifiers.is_empty() {
-            open.push(self.modifiers);
+        if !value.modifiers.is_empty() {
+            open.push(value.modifiers);
             open.push(" ");
         }
 
-        match self.returns {
+        match value.returns {
             None => open.push("void "),
             Some(ref returns) => {
                 open.push(returns);
@@ -183,64 +173,64 @@ impl AsElementSpec for MethodSpec {
             }
         }
 
-        open.push(self.name);
+        open.push(value.name);
         open.push("(");
 
-        if !self.arguments.is_empty() {
-            open.push(Statement::join_statements(&self.arguments, ", "));
+        if !value.arguments.is_empty() {
+            open.push(Statement::join_statements(&value.arguments, ", "));
         }
 
         open.push(") {");
 
         elements.push(open);
-        elements.push_nested(self.elements.join(ElementSpec::Spacing));
+        elements.push_nested(value.elements.join(ElementSpec::Spacing));
         elements.push("}");
 
-        elements.as_element_spec()
+        elements.into()
     }
 }
 
-impl AsElementSpec for InterfaceSpec {
-    fn as_element_spec(self) -> ElementSpec {
+impl From<InterfaceSpec> for ElementSpec {
+    fn from(value: InterfaceSpec) -> ElementSpec {
         let mut elements = Elements::new();
 
         let mut open = Statement::new();
 
-        for a in &self.annotations {
+        for a in &value.annotations {
             elements.push(a);
         }
 
-        if !self.modifiers.is_empty() {
-            open.push(self.modifiers);
+        if !value.modifiers.is_empty() {
+            open.push(value.modifiers);
             open.push(" ");
         }
 
         open.push("interface ");
-        open.push(self.name);
+        open.push(value.name);
         open.push(" {");
 
         elements.push(open);
-        elements.push_nested(self.elements.join(ElementSpec::Spacing));
+        elements.push_nested(value.elements.join(ElementSpec::Spacing));
         elements.push("}");
 
-        elements.as_element_spec()
+        elements.into()
     }
 }
 
-impl AsElementSpec for AnnotationSpec {
-    fn as_element_spec(self) -> ElementSpec {
+impl From<AnnotationSpec> for ElementSpec {
+    fn from(value: AnnotationSpec) -> ElementSpec {
         let mut elements = Elements::new();
 
         let mut annotation = Statement::new();
         annotation.push("@");
-        annotation.push(self.ty);
+        annotation.push(value.ty);
 
-        if !self.arguments.is_empty() {
+        if !value.arguments.is_empty() {
             let mut open = Statement::new();
 
             open.push(annotation);
             open.push("(");
-            open.push(Statement::join_with(&self.arguments, ", "));
+            open.push(Statement::join_with(&value.arguments, ", "));
             open.push(")");
 
             elements.push(open);
@@ -248,15 +238,15 @@ impl AsElementSpec for AnnotationSpec {
             elements.push(annotation);
         }
 
-        elements.as_element_spec()
+        elements.into()
     }
 }
 
-impl AsElementSpec for EnumSpec {
-    fn as_element_spec(self) -> ElementSpec {
+impl From<EnumSpec> for ElementSpec {
+    fn from(value: EnumSpec) -> ElementSpec {
         let mut elements = Elements::new();
 
-        for a in &self.annotations {
+        for a in &value.annotations {
             elements.push(a);
         }
 
@@ -264,18 +254,18 @@ impl AsElementSpec for EnumSpec {
         {
             let mut open = Statement::new();
 
-            if !self.modifiers.is_empty() {
-                open.push(self.modifiers);
+            if !value.modifiers.is_empty() {
+                open.push(value.modifiers);
                 open.push(" ");
             }
 
             open.push("enum ");
-            open.push(&self.name);
+            open.push(&value.name);
 
-            if !self.implements.is_empty() {
+            if !value.implements.is_empty() {
                 let mut arguments = Statement::new();
 
-                for implements in &self.implements {
+                for implements in &value.implements {
                     arguments.push(implements);
                 }
 
@@ -301,7 +291,7 @@ impl AsElementSpec for EnumSpec {
 
             value_joiner.push(ElementSpec::Concat(comma));
 
-            values.push(self.values.join(value_joiner));
+            values.push(value.values.join(value_joiner));
 
             let mut endl = Statement::new();
             endl.push(";");
@@ -311,11 +301,11 @@ impl AsElementSpec for EnumSpec {
             enum_body.push(values);
         }
 
-        if !self.fields.is_empty() {
+        if !value.fields.is_empty() {
             let mut fields = Elements::new();
 
-            for field in &self.fields {
-                let mut field = field.as_statement();
+            for field in &value.fields {
+                let mut field: Statement = field.into();
                 field.push(";");
                 fields.push(field);
             }
@@ -323,17 +313,17 @@ impl AsElementSpec for EnumSpec {
             enum_body.push(fields);
         }
 
-        for constructor in &self.constructors {
-            enum_body.push(constructor.as_element_spec(&self.name));
+        for constructor in &value.constructors {
+            enum_body.push(constructor.as_element_spec(&value.name));
         }
 
-        for element in &self.elements.elements {
+        for element in &value.elements.elements {
             enum_body.push(element);
         }
 
         elements.push_nested(enum_body.join(ElementSpec::Spacing));
         elements.push("}");
 
-        elements.as_element_spec()
+        elements.into()
     }
 }

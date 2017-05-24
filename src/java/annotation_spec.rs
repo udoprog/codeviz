@@ -1,5 +1,5 @@
-use super::_type::{AsType, Type, ClassType};
-use super::statement::{AsStatement, Statement};
+use super::_type::{Type, ClassType};
+use super::statement::Statement;
 
 #[derive(Debug, Clone)]
 pub struct AnnotationSpec {
@@ -9,41 +9,31 @@ pub struct AnnotationSpec {
 
 impl AnnotationSpec {
     pub fn new<I>(ty: I) -> AnnotationSpec
-        where I: AsType
+        where I: Into<Type>
     {
         AnnotationSpec {
-            ty: ty.as_type(),
+            ty: ty.into(),
             arguments: Vec::new(),
         }
     }
 
     pub fn push_argument<S>(&mut self, statement: S)
-        where S: AsStatement
+        where S: Into<Statement>
     {
-        self.arguments.push(statement.as_statement());
+        self.arguments.push(statement.into());
     }
 }
 
-pub trait AsAnnotationSpec {
-    fn as_annotation_spec(self) -> AnnotationSpec;
-}
-
-impl<'a, A> AsAnnotationSpec for &'a A
-    where A: AsAnnotationSpec + Clone
+impl<'a, T> From<&'a T> for AnnotationSpec
+    where T: Into<AnnotationSpec> + Clone
 {
-    fn as_annotation_spec(self) -> AnnotationSpec {
-        self.clone().as_annotation_spec()
+    fn from(value: &'a T) -> AnnotationSpec {
+        value.clone().into()
     }
 }
 
-impl AsAnnotationSpec for AnnotationSpec {
-    fn as_annotation_spec(self) -> AnnotationSpec {
-        self
-    }
-}
-
-impl AsAnnotationSpec for ClassType {
-    fn as_annotation_spec(self) -> AnnotationSpec {
-        AnnotationSpec::new(self)
+impl From<ClassType> for AnnotationSpec {
+    fn from(value: ClassType) -> AnnotationSpec {
+        AnnotationSpec::new(value)
     }
 }

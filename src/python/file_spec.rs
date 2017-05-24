@@ -1,4 +1,4 @@
-use super::element_spec::{AsElementSpec, ElementSpec};
+use super::element_spec::ElementSpec;
 use super::elements::Elements;
 use super::imports::{Imports, ImportReceiver};
 use super::name::ImportedName;
@@ -15,7 +15,7 @@ impl FileSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: AsElementSpec
+        where E: Into<ElementSpec>
     {
         self.elements.push(element);
     }
@@ -46,7 +46,7 @@ impl FileSpec {
             out.push('\n');
         }
 
-        let elements = self.elements.clone().join(ElementSpec::Spacing).as_element_spec();
+        let elements: ElementSpec = self.elements.clone().join(ElementSpec::Spacing).into();
 
         for line in elements.format("", "  ") {
             out.push_str(&line);

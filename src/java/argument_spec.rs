@@ -1,4 +1,4 @@
-use super::_type::{AsType, Type};
+use super::_type::Type;
 use super::annotation_spec::AnnotationSpec;
 use super::modifier::Modifiers;
 
@@ -12,11 +12,11 @@ pub struct ArgumentSpec {
 
 impl ArgumentSpec {
     pub fn new<I>(modifiers: Modifiers, ty: I, name: &str) -> ArgumentSpec
-        where I: AsType
+        where I: Into<Type>
     {
         ArgumentSpec {
             modifiers: modifiers,
-            ty: ty.as_type(),
+            ty: ty.into(),
             name: name.to_owned(),
             annotations: Vec::new(),
         }
@@ -27,20 +27,10 @@ impl ArgumentSpec {
     }
 }
 
-pub trait AsArgumentSpec {
-    fn as_argument_spec(self) -> ArgumentSpec;
-}
-
-impl<'a, A> AsArgumentSpec for &'a A
-    where A: AsArgumentSpec + Clone
+impl<'a, A> From<&'a A> for ArgumentSpec
+    where A: Into<ArgumentSpec> + Clone
 {
-    fn as_argument_spec(self) -> ArgumentSpec {
-        self.clone().as_argument_spec()
-    }
-}
-
-impl AsArgumentSpec for ArgumentSpec {
-    fn as_argument_spec(self) -> ArgumentSpec {
-        self
+    fn from(value: &'a A) -> ArgumentSpec {
+        value.clone().into()
     }
 }
