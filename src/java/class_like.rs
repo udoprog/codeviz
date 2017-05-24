@@ -2,7 +2,6 @@ use super::_type::ClassType;
 use super::annotation_spec::AnnotationSpec;
 use super::class_spec::ClassSpec;
 use super::constructor_spec::ConstructorSpec;
-use super::element_spec::ElementSpec;
 use super::enum_spec::EnumSpec;
 use super::field_spec::FieldSpec;
 
@@ -16,8 +15,6 @@ pub trait ClassLike {
     fn fields(&self) -> &Vec<FieldSpec>;
 
     fn push_constructor<C>(&mut self, constructor: C) where C: Into<ConstructorSpec>;
-
-    fn push<E>(&mut self, element: E) where E: Into<ElementSpec>;
 }
 
 impl ClassLike for ClassSpec {
@@ -48,12 +45,6 @@ impl ClassLike for ClassSpec {
     {
         self.constructors.push(constructor.into());
     }
-
-    fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec>
-    {
-        self.elements.push(element);
-    }
 }
 
 impl ClassLike for EnumSpec {
@@ -83,11 +74,5 @@ impl ClassLike for EnumSpec {
         where C: Into<ConstructorSpec>
     {
         self.constructors.push(constructor.into());
-    }
-
-    fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec>
-    {
-        self.elements.push(element);
     }
 }
