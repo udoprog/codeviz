@@ -73,24 +73,17 @@ impl Local {
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
-pub struct PrimitiveType {
-    pub primitive: String,
-    pub boxed: String,
+pub struct PrimitiveType<'a> {
+    pub primitive: &'a str,
+    pub boxed: &'a str,
 }
 
-impl PrimitiveType {
-    pub fn new(primitive: &str, boxed: &str) -> PrimitiveType {
-        PrimitiveType {
-            primitive: primitive.to_owned(),
-            boxed: boxed.to_owned(),
-        }
-    }
-
+impl<'a> PrimitiveType<'a> {
     pub fn format(&self, level: usize) -> String {
         if level <= 0 {
-            self.primitive.clone()
+            self.primitive.to_owned()
         } else {
-            self.boxed.clone()
+            self.boxed.to_owned()
         }
     }
 
@@ -102,16 +95,12 @@ impl PrimitiveType {
 /// Raw (importable) types.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
 pub enum Type {
-    Primitive(PrimitiveType),
+    Primitive(PrimitiveType<'static>),
     Class(ClassType),
     Local(Local),
 }
 
 impl Type {
-    pub fn primitive(primitive: &str, boxed: &str) -> PrimitiveType {
-        PrimitiveType::new(primitive, boxed)
-    }
-
     pub fn class(package: &str, name: &str) -> ClassType {
         ClassType::new(package, name, vec![])
     }
@@ -153,8 +142,8 @@ impl From<ClassType> for Type {
 }
 
 /// Implementation for PrimitiveType to Type conversion.
-impl From<PrimitiveType> for Type {
-    fn from(value: PrimitiveType) -> Type {
+impl From<PrimitiveType<'static>> for Type {
+    fn from(value: PrimitiveType<'static>) -> Type {
         Type::Primitive(value)
     }
 }
@@ -164,3 +153,45 @@ impl From<Local> for Type {
         Type::Local(value)
     }
 }
+
+/// Primitive constants
+
+pub const INTEGER: PrimitiveType<'static> = PrimitiveType {
+    primitive: "int",
+    boxed: "Integer",
+};
+
+pub const LONG: PrimitiveType<'static> = PrimitiveType {
+    primitive: "long",
+    boxed: "Long",
+};
+
+pub const FLOAT: PrimitiveType<'static> = PrimitiveType {
+    primitive: "float",
+    boxed: "Float",
+};
+
+pub const DOUBLE: PrimitiveType<'static> = PrimitiveType {
+    primitive: "double",
+    boxed: "Double",
+};
+
+pub const CHAR: PrimitiveType<'static> = PrimitiveType {
+    primitive: "char",
+    boxed: "Character",
+};
+
+pub const BOOLEAN: PrimitiveType<'static> = PrimitiveType {
+    primitive: "boolean",
+    boxed: "Boolean",
+};
+
+pub const BYTE: PrimitiveType<'static> = PrimitiveType {
+    primitive: "byte",
+    boxed: "Byte",
+};
+
+pub const VOID: PrimitiveType<'static> = PrimitiveType {
+    primitive: "void",
+    boxed: "Void",
+};
