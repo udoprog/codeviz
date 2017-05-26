@@ -156,6 +156,11 @@ impl From<Local> for Type {
 
 /// Primitive constants
 
+pub const SHORT: PrimitiveType<'static> = PrimitiveType {
+    primitive: "short",
+    boxed: "Short",
+};
+
 pub const INTEGER: PrimitiveType<'static> = PrimitiveType {
     primitive: "int",
     boxed: "Integer",
