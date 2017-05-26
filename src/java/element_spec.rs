@@ -212,6 +212,18 @@ impl From<InterfaceSpec> for ElementSpec {
 
         open.push("interface ");
         open.push(value.name);
+
+        if !value.extends.is_empty() {
+            let mut arguments = Statement::new();
+
+            for extends in &value.extends {
+                arguments.push(extends);
+            }
+
+            open.push(" extends ");
+            open.push(arguments.join(","));
+        }
+
         open.push(" {");
 
         elements.push(open);
