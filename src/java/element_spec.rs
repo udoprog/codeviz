@@ -130,15 +130,17 @@ impl From<ClassSpec> for ElementSpec {
 
         let mut class_body = Elements::new();
 
-        let mut fields = Elements::new();
+        if !value.fields.is_empty() {
+            let mut fields = Elements::new();
 
-        for field in &value.fields {
-            let mut field: Statement = field.into();
-            field.push(";");
-            fields.push(field);
+            for field in &value.fields {
+                let mut field: Statement = field.into();
+                field.push(";");
+                fields.push(field);
+            }
+
+            class_body.push(fields);
         }
-
-        class_body.push(fields);
 
         for constructor in &value.constructors {
             class_body.push(constructor.as_element_spec(&value.name));
