@@ -13,6 +13,7 @@ pub struct ClassSpec {
     pub fields: Vec<FieldSpec>,
     pub constructors: Vec<ConstructorSpec>,
     pub elements: Elements,
+    pub extends: Option<ClassType>,
     pub implements: Vec<ClassType>,
 }
 
@@ -25,7 +26,14 @@ impl ClassSpec {
             fields: Vec::new(),
             constructors: Vec::new(),
             elements: Elements::new(),
+            extends: None,
             implements: Vec::new(),
         }
+    }
+
+    pub fn extends<T>(&mut self, ty: T)
+        where T: Into<ClassType>
+    {
+        self.extends = Some(ty.into());
     }
 }

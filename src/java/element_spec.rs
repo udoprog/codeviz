@@ -108,6 +108,11 @@ impl From<ClassSpec> for ElementSpec {
         open.push("class ");
         open.push(&value.name);
 
+        if let Some(ref extends) = value.extends {
+            open.push(" extends ");
+            open.push(extends);
+        }
+
         if !value.implements.is_empty() {
             let mut arguments = Statement::new();
 
