@@ -2,9 +2,11 @@ use std::collections::BTreeSet;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash)]
 pub enum Modifier {
+    Default,
     Public,
     Protected,
     Private,
+    Abstract,
     Static,
     Final,
 }
@@ -28,6 +30,8 @@ impl Modifiers {
 
         for m in &self.modifiers {
             out.push(match *m {
+                Modifier::Abstract => "abstract".to_owned(),
+                Modifier::Default => "default".to_owned(),
                 Modifier::Public => "public".to_owned(),
                 Modifier::Protected => "protected".to_owned(),
                 Modifier::Private => "private".to_owned(),

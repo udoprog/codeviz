@@ -1,6 +1,7 @@
 use super::variable::Variable;
 
-fn python_quote_string(input: &str) -> String {
+/// Quote a string to make it suitable as a literal Python string.
+fn quote_string(input: &str) -> String {
     let mut out = String::new();
     let mut it = input.chars();
 
@@ -24,6 +25,7 @@ fn python_quote_string(input: &str) -> String {
     out
 }
 
+/// A single statement, made up by variables.
 #[derive(Debug, Clone)]
 pub struct Statement {
     pub parts: Vec<Variable>,
@@ -70,7 +72,7 @@ impl Statement {
         for part in &self.parts {
             match *part {
                 Variable::String(ref string) => {
-                    current.push(python_quote_string(string));
+                    current.push(quote_string(string));
                 }
                 Variable::Statement(ref stmt) => {
                     current.push(stmt.format().join(" "));
@@ -80,10 +82,6 @@ impl Statement {
                 }
                 Variable::Name(ref name) => {
                     current.push(name.format());
-                }
-                Variable::Spacing => {
-                    out.push(current.join(""));
-                    current.clear();
                 }
             }
         }

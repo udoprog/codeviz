@@ -1,13 +1,17 @@
 use super::statement::Statement;
 use super::name::{Name, ImportedName, BuiltInName, LocalName};
 
+/// Variables that are part of statements.
 #[derive(Debug, Clone)]
 pub enum Variable {
+    /// String that will be literally appended.
     Literal(String),
+    /// String that will be quoted and appended.
     String(String),
+    /// Another statement that will be appended.
     Statement(Statement),
+    /// A name that will be appended.
     Name(Name),
-    Spacing,
 }
 
 impl<'a, A> From<&'a A> for Variable

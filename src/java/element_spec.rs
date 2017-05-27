@@ -201,11 +201,17 @@ impl From<MethodSpec> for ElementSpec {
             open.push(arguments.join(", "));
         }
 
-        open.push(" {");
+        if !value.elements.is_empty() {
+            open.push(" {");
 
-        elements.push(open);
-        elements.push_nested(value.elements.join(ElementSpec::Spacing));
-        elements.push("}");
+            elements.push(open);
+            elements.push_nested(value.elements.join(ElementSpec::Spacing));
+            elements.push("}");
+        } else {
+            open.push(";");
+
+            elements.push(open);
+        }
 
         elements.into()
     }
