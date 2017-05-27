@@ -187,7 +187,21 @@ impl From<MethodSpec> for ElementSpec {
             open.push(Statement::join_statements(&value.arguments, ", "));
         }
 
-        open.push(") {");
+        open.push(")");
+
+        if !value.throws.is_empty() {
+            open.push(" throws ");
+
+            let mut arguments = Statement::new();
+
+            for throw in &value.throws {
+                arguments.push(throw);
+            }
+
+            open.push(arguments.join(", "));
+        }
+
+        open.push(" {");
 
         elements.push(open);
         elements.push_nested(value.elements.join(ElementSpec::Spacing));

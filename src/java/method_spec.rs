@@ -1,4 +1,4 @@
-use super::_type::Type;
+use super::_type::{ClassType, Type};
 use super::annotation_spec::AnnotationSpec;
 use super::argument_spec::ArgumentSpec;
 use super::element_spec::ElementSpec;
@@ -12,6 +12,7 @@ pub struct MethodSpec {
     pub annotations: Vec<AnnotationSpec>,
     pub arguments: Vec<ArgumentSpec>,
     pub returns: Option<Type>,
+    pub throws: Vec<ClassType>,
     pub elements: Elements,
 }
 
@@ -23,6 +24,7 @@ impl MethodSpec {
             annotations: Vec::new(),
             arguments: Vec::new(),
             returns: None,
+            throws: Vec::new(),
             elements: Elements::new(),
         }
     }
@@ -43,6 +45,12 @@ impl MethodSpec {
         where T: Into<Type>
     {
         self.returns = Some(returns.into())
+    }
+
+    pub fn throws<T>(&mut self, throws: T)
+        where T: Into<ClassType>
+    {
+        self.throws.push(throws.into())
     }
 
     pub fn push<E>(&mut self, element: E)

@@ -1,3 +1,4 @@
+use super::_type::ClassType;
 use super::annotation_spec::AnnotationSpec;
 use super::argument_spec::ArgumentSpec;
 use super::element_spec::ElementSpec;
@@ -10,6 +11,7 @@ pub struct ConstructorSpec {
     pub modifiers: Modifiers,
     pub annotations: Vec<AnnotationSpec>,
     pub arguments: Vec<ArgumentSpec>,
+    pub throws: Vec<ClassType>,
     pub elements: Elements,
 }
 
@@ -19,6 +21,7 @@ impl ConstructorSpec {
             modifiers: modifiers,
             annotations: Vec::new(),
             arguments: Vec::new(),
+            throws: Vec::new(),
             elements: Elements::new(),
         }
     }
@@ -33,6 +36,12 @@ impl ConstructorSpec {
         where A: Into<ArgumentSpec>
     {
         self.arguments.push(argument.into());
+    }
+
+    pub fn throws<T>(&mut self, throws: T)
+        where T: Into<ClassType>
+    {
+        self.throws.push(throws.into())
     }
 
     pub fn push<E>(&mut self, element: E)
@@ -58,7 +67,21 @@ impl ConstructorSpec {
         open.push(enclosing);
         open.push("(");
         open.push(Statement::join_statements(&self.arguments, ", "));
-        open.push(") {");
+        open.push(")");
+
+        if !self.throws.is_empty() {
+            open.push(" throws ");
+
+            let mut arguments = Statement::new();
+
+            for throw in &self.throws {
+                arguments.push(throw);
+            }
+
+            open.push(arguments.join(", "));
+        }
+
+        open.push(" {");
 
         elements.push(open);
         elements.push_nested(&self.elements);
