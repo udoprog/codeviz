@@ -1,3 +1,4 @@
+use common::ElementFormat;
 use super::annotation_spec::AnnotationSpec;
 use super::class_spec::ClassSpec;
 use super::elements::Elements;
@@ -5,12 +6,6 @@ use super::enum_spec::EnumSpec;
 use super::interface_spec::InterfaceSpec;
 use super::method_spec::MethodSpec;
 use super::statement::Statement;
-
-pub trait ElementFormat {
-    fn push(&mut self, value: &str);
-
-    fn concat(&mut self, value: &str);
-}
 
 #[derive(Debug, Clone)]
 pub enum ElementSpec {

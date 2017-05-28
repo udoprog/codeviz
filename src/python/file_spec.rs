@@ -1,3 +1,4 @@
+use common::ElementFormat;
 use super::element_spec::ElementSpec;
 use super::elements::Elements;
 use super::imports::{Imports, ImportReceiver};
@@ -42,18 +43,12 @@ impl FileSpec {
 
                 out.push('\n');
             }
-
-            out.push('\n');
         }
 
         let elements: ElementSpec = self.elements.clone().join(ElementSpec::Spacing).into();
 
-        for line in elements.format("", "  ") {
-            out.push_str(&line);
-            out.push('\n');
-        }
-
-        out
+        elements.format("", "  ", &mut out);
+        out.end()
     }
 }
 

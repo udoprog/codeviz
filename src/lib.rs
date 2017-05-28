@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate error_chain;
 
+pub mod common;
 pub mod errors;
 pub mod java;
 pub mod python;
@@ -128,8 +129,6 @@ mod java_tests {
         file.push(&class);
 
         let result = file.format();
-
-        println!("{}", result);
 
         let reference = ::std::str::from_utf8(include_bytes!("tests/Test.java")).unwrap();
         assert_eq!(reference, result);

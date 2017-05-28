@@ -1,42 +1,11 @@
+use common::ElementFormat;
 use super::_type::ClassType;
-use super::element_spec::{ElementFormat, ElementSpec};
+use super::element_spec::ElementSpec;
 use super::elements::Elements;
 use super::imports::{Imports, ImportReceiver};
 use super::statement::Statement;
 
 use std::collections::BTreeSet;
-
-pub struct StringElementFormat {
-    buffer: String,
-}
-
-impl StringElementFormat {
-    pub fn new() -> StringElementFormat {
-        StringElementFormat { buffer: String::new() }
-    }
-
-    pub fn format(mut self) -> String {
-        if self.buffer.len() > 0 {
-            self.buffer.push('\n');
-        }
-
-        self.buffer
-    }
-}
-
-impl ElementFormat for StringElementFormat {
-    fn push(&mut self, value: &str) {
-        if self.buffer.len() > 0 {
-            self.buffer.push('\n');
-        }
-
-        self.buffer.push_str(value);
-    }
-
-    fn concat(&mut self, value: &str) {
-        self.buffer.push_str(value);
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct FileSpec {
@@ -96,17 +65,14 @@ impl FileSpec {
             file.push(imported);
         }
 
-        for element in &self.elements.elements {
-            file.push(element);
-        }
+        let content: ElementSpec = self.elements.clone().join(ElementSpec::Spacing).into();
+        file.push(content);
 
         let file: ElementSpec = file.join(ElementSpec::Spacing).into();
 
-        let mut out = StringElementFormat::new();
-
+        let mut out = String::new();
         file.format("", "  ", &mut out);
-
-        out.format()
+        out.end()
     }
 }
 

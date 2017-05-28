@@ -1,3 +1,4 @@
+use common::ElementFormat;
 use super::class_spec::ClassSpec;
 use super::decorator_spec::DecoratorSpec;
 use super::elements::Elements;
@@ -14,33 +15,31 @@ pub enum ElementSpec {
 }
 
 impl ElementSpec {
-    pub fn format(&self, current: &str, indent: &str) -> Vec<String> {
-        let mut out = Vec::new();
-
+    pub fn format<E>(&self, current: &str, indent: &str, out: &mut E)
+        where E: ElementFormat
+    {
         match *self {
             ElementSpec::Statement(ref statement) => {
                 for line in statement.format() {
-                    out.push(format!("{}{}", current, line));
+                    out.push(&format!("{}{}", current, line));
                 }
             }
             ElementSpec::Literal(ref line) => {
-                out.push(format!("{}{}", current, line));
+                out.push(&format!("{}{}", current, line));
             }
             ElementSpec::Elements(ref elements) => {
                 for element in elements {
-                    out.extend(element.format(current, indent));
+                    element.format(current, indent, out);
                 }
             }
             ElementSpec::Nested(ref element) => {
                 let next_current = format!("{}{}", current, indent);
-                out.extend(element.format(&next_current, indent));
+                element.format(&next_current, indent, out);
             }
             ElementSpec::Spacing => {
-                out.push("".to_owned());
+                out.push("");
             }
         };
-
-        out
     }
 }
 
