@@ -4,6 +4,7 @@ extern crate error_chain;
 pub mod common;
 pub mod errors;
 pub mod java;
+pub mod js;
 pub mod python;
 
 /// Macro to build statements.
@@ -153,5 +154,24 @@ mod java_tests {
         let class = EnumSpec::new(mods![Modifier::Public], "Foo");
         let class: ElementSpec = class.into();
         assert_eq!("public enum Foo {;\n}\n", class.to_string());
+    }
+}
+
+#[cfg(test)]
+mod js_tests {
+    use js::*;
+
+    #[test]
+    fn test_file() {
+        let mut foo = FunctionSpec::new("foo");
+        let m = Name::imported("foo", "hello");
+        foo.push(stmt!["return ", m, "();"]);
+
+        let mut file = FileSpec::new();
+        file.push(foo);
+        let result = file.format();
+
+        assert_eq!("import {hello} from \"foo.js\";\n\nfunction foo() {\n  return hello();\n}\n",
+                   result);
     }
 }
