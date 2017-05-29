@@ -1,4 +1,5 @@
 use common::ElementFormat;
+use super::_type::ClassType;
 use super::annotation_spec::AnnotationSpec;
 use super::class_spec::ClassSpec;
 use super::elements::Elements;
@@ -50,6 +51,31 @@ impl ElementSpec {
                 out.push("");
             }
         };
+    }
+
+    fn implements<'a, I>(implements: I, dest: &mut Statement)
+        where I: IntoIterator<Item = &'a ClassType>
+    {
+        let mut it = implements.into_iter();
+
+        if let Some(first) = it.next() {
+            dest.push(" implements ");
+
+            dest.push(first);
+
+            while let Some(next) = it.next() {
+                dest.push(", ");
+                dest.push(next);
+            }
+        }
+    }
+}
+
+impl ToString for ElementSpec {
+    fn to_string(&self) -> String {
+        let mut out = String::new();
+        self.format("", "  ", &mut out);
+        out.end()
     }
 }
 
@@ -108,16 +134,7 @@ impl From<ClassSpec> for ElementSpec {
             open.push(extends);
         }
 
-        if !value.implements.is_empty() {
-            let mut arguments = Statement::new();
-
-            for implements in &value.implements {
-                arguments.push(implements);
-            }
-
-            open.push(" implements ");
-            open.push(arguments.join(", "));
-        }
+        ElementSpec::implements(&value.implements, &mut open);
 
         open.push(" {");
 
@@ -296,16 +313,7 @@ impl From<EnumSpec> for ElementSpec {
             open.push("enum ");
             open.push(&value.name);
 
-            if !value.implements.is_empty() {
-                let mut arguments = Statement::new();
-
-                for implements in &value.implements {
-                    arguments.push(implements);
-                }
-
-                open.push(" implements ");
-                open.push(arguments.join(","));
-            }
+            ElementSpec::implements(&value.implements, &mut open);
 
             open.push(" {");
 

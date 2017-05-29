@@ -49,11 +49,12 @@ impl Statement {
         Statement::join_with(&self.parts, separator)
     }
 
-    pub fn join_with<S, A>(parts: &Vec<S>, separator: A) -> Statement
-        where S: Into<Variable> + Clone,
+    pub fn join_with<'a, I, S, A>(parts: I, separator: A) -> Statement
+        where I: IntoIterator<Item = &'a S>,
+              S: 'a + Into<Variable> + Clone,
               A: Into<Variable> + Clone
     {
-        let mut it = parts.iter().map(Into::into);
+        let mut it = parts.into_iter().map(Into::into);
 
         let part = match it.next() {
             Some(part) => part,
@@ -73,11 +74,12 @@ impl Statement {
         Statement { parts: parts }
     }
 
-    pub fn join_statements<S, A>(parts: &Vec<S>, separator: A) -> Statement
-        where S: Into<Statement> + Clone,
+    pub fn join_statements<'a, I, S, A>(parts: I, separator: A) -> Statement
+        where I: IntoIterator<Item = &'a S>,
+              S: 'a + Into<Statement> + Clone,
               A: Into<Variable> + Clone
     {
-        let mut it = parts.iter().map(Into::into);
+        let mut it = parts.into_iter().map(Into::into);
 
         let part: Statement = match it.next() {
             Some(part) => part,
