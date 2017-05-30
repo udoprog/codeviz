@@ -94,11 +94,11 @@ impl From<ClassSpec> for ElementSpec {
         let mut body = Elements::new();
 
         if !value.constructors.is_empty() {
-            body.push_nested(value.constructors.join(ElementSpec::Spacing));
+            body.push(value.constructors.join(ElementSpec::Spacing));
         }
 
         if !value.elements.is_empty() {
-            body.push_nested(value.elements.join(ElementSpec::Spacing));
+            body.push(value.elements.join(ElementSpec::Spacing));
         }
 
         let mut out = Elements::new();
