@@ -87,10 +87,8 @@ mod python_tests {
 
         file.push(foo);
 
-        let result = file.format();
-
         let reference = ::std::str::from_utf8(include_bytes!("tests/test.py")).unwrap();
-        assert_eq!(reference, result);
+        assert_eq!(reference, file.to_string());
     }
 }
 
@@ -129,33 +127,29 @@ mod java_tests {
         let mut file = FileSpec::new("se.tedro");
         file.push(&class);
 
-        let result = file.format();
-
-        println!("result = {}", result);
-
         let reference = ::std::str::from_utf8(include_bytes!("tests/Test.java")).unwrap();
-        assert_eq!(reference, result);
+        assert_eq!(reference, file.to_string());
     }
 
     #[test]
     fn test_class_spec() {
         let class = ClassSpec::new(mods![Modifier::Public], "Foo");
         let class: ElementSpec = class.into();
-        // assert_eq!("public class Foo {\n}\n", class.to_string());
+        assert_eq!("public class Foo {\n}", class.to_string());
     }
 
     #[test]
     fn test_interface_spec() {
         let class = InterfaceSpec::new(mods![Modifier::Public], "Foo");
         let class: ElementSpec = class.into();
-        // assert_eq!("public interface Foo {\n}\n", class.to_string());
+        assert_eq!("public interface Foo {\n}", class.to_string());
     }
 
     #[test]
     fn test_enum_spec() {
         let class = EnumSpec::new(mods![Modifier::Public], "Foo");
         let class: ElementSpec = class.into();
-        // assert_eq!("public enum Foo {;\n}\n", class.to_string());
+        assert_eq!("public enum Foo {\n  ;\n}", class.to_string());
     }
 }
 
@@ -171,7 +165,8 @@ mod js_tests {
 
         let mut file = FileSpec::new();
         file.push(foo);
-        let result = file.format();
+
+        let result = file.to_string();
 
         assert_eq!("import {hello} from \"foo.js\";\n\nfunction foo() {\n  return hello();\n}\n",
                    result);

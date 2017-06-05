@@ -1,9 +1,11 @@
 use common::ElementFormatter;
+use errors::*;
+use std::collections::BTreeSet;
 use super::element_spec::ElementSpec;
 use super::elements::Elements;
 use super::imports::{Imports, ImportReceiver};
 use super::name::ImportedName;
-use std::collections::BTreeSet;
+use super::statement::Statement;
 
 #[derive(Debug, Clone)]
 pub struct FileSpec {
@@ -21,9 +23,7 @@ impl FileSpec {
         self.elements.push(element);
     }
 
-    pub fn format(&self) -> String {
-        let mut s = String::new();
-
+    fn imports(&self) -> Option<Elements> {
         let mut imports = BTreeSet::new();
 
         self.elements.imports(&mut imports);
@@ -31,28 +31,59 @@ impl FileSpec {
         let modules: BTreeSet<(String, Option<String>)> =
             imports.into_iter().map(|imported| (imported.module, imported.alias)).collect();
 
-        if !modules.is_empty() {
-            for (module, alias) in modules {
-                s.push_str("import ");
-                s.push_str(&module);
-
-                if let Some(ref alias) = alias {
-                    s.push_str(" as ");
-                    s.push_str(alias);
-                }
-
-                s.push('\n');
-            }
+        if modules.is_empty() {
+            return None;
         }
 
-        let elements: ElementSpec = self.elements.clone().join(ElementSpec::Spacing).into();
-        elements.format("", "  ", &mut ElementFormatter::new(&mut s)).unwrap();
-        s
+        let mut elements = Elements::new();
+
+        for (module, alias) in modules {
+            let mut s = Statement::new();
+
+            s.push("import ");
+            s.push(&module);
+
+            if let Some(ref alias) = alias {
+                s.push(" as ");
+                s.push(alias);
+            }
+
+            elements.push(s);
+        }
+
+        Some(elements)
+    }
+
+    pub fn format<W>(&self, out: &mut W) -> Result<()>
+        where W: ::std::fmt::Write
+    {
+        let mut elements = Elements::new();
+
+        if let Some(imports) = self.imports() {
+            elements.push(imports);
+        }
+
+        elements.push(self.elements.clone().join(ElementSpec::Spacing));
+
+        let elements: ElementSpec = elements.clone().join(ElementSpec::Spacing).into();
+
+        elements.format(&mut ElementFormatter::new(out))?;
+        out.write_char('\n')?;
+
+        Ok(())
     }
 }
 
 impl ImportReceiver for BTreeSet<ImportedName> {
     fn receive(&mut self, name: &ImportedName) {
         self.insert(name.clone());
+    }
+}
+
+impl ToString for FileSpec {
+    fn to_string(&self) -> String {
+        let mut s = String::new();
+        self.format(&mut s).unwrap();
+        s
     }
 }

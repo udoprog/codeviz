@@ -1,3 +1,6 @@
+use errors::*;
+use common::ElementFormat;
+
 #[derive(Debug, Clone)]
 pub enum Name {
     Imported(ImportedName),
@@ -30,18 +33,22 @@ impl Name {
         LocalName { name: name.to_owned() }
     }
 
-    pub fn format(&self) -> String {
+    pub fn format<E>(&self, out: &mut E) -> Result<()>
+        where E: ElementFormat
+    {
         match *self {
             Name::Imported(ref imported) => {
                 if let Some(ref alias) = imported.alias {
-                    format!("{}.{}", alias, imported.name.clone())
+                    write!(out, "{}.{}", alias, imported.name.clone())
                 } else {
-                    imported.name.clone()
+                    out.write_str(&imported.name)
                 }
             }
-            Name::BuiltIn(ref built_in) => built_in.name.clone(),
-            Name::Local(ref local) => local.name.clone(),
-        }
+            Name::BuiltIn(ref built_in) => out.write_str(&built_in.name),
+            Name::Local(ref local) => out.write_str(&local.name),
+        }?;
+
+        Ok(())
     }
 }
 

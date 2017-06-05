@@ -366,3 +366,11 @@ impl From<EnumSpec> for ElementSpec {
         elements.into()
     }
 }
+
+impl ToString for ElementSpec {
+    fn to_string(&self) -> String {
+        let mut s = String::new();
+        self.format(&mut ::common::ElementFormatter::new(&mut s)).unwrap();
+        s
+    }
+}

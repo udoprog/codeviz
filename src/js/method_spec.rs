@@ -41,3 +41,33 @@ impl MethodSpec {
         self.elements.push(element);
     }
 }
+
+impl From<MethodSpec> for ElementSpec {
+    fn from(value: MethodSpec) -> ElementSpec {
+        let mut open = Statement::new();
+
+        let mut arguments = Statement::new();
+
+        for argument in value.arguments {
+            arguments.push(argument);
+        }
+
+        if value.is_static {
+            open.push("static ");
+        }
+
+        open.push(value.name);
+        open.push("(");
+        open.push(arguments.join(", "));
+        open.push(")");
+
+        open.push(" {");
+
+        let mut out = Elements::new();
+        out.push(open);
+        out.push_nested(value.elements.join(ElementSpec::Spacing));
+        out.push("}");
+
+        out.into()
+    }
+}

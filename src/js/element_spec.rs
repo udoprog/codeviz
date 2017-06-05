@@ -1,10 +1,5 @@
 use errors::*;
 use common::ElementFormat;
-use super::class_spec::ClassSpec;
-use super::elements::Elements;
-use super::function_spec::FunctionSpec;
-use super::method_spec::MethodSpec;
-use super::constructor_spec::ConstructorSpec;
 use super::statement::Statement;
 
 #[derive(Debug, Clone)]
@@ -17,30 +12,32 @@ pub enum ElementSpec {
 }
 
 impl ElementSpec {
-    pub fn format<E>(&self, current: &str, indent: &str, out: &mut E) -> Result<()>
+    pub fn format<E>(&self, out: &mut E) -> Result<()>
         where E: ElementFormat
     {
         match *self {
             ElementSpec::Statement(ref statement) => {
-                for line in statement.format() {
-                    out.write_str(&format!("{}{}", current, line))?;
-                    out.new_line()?;
-                }
+                out.new_line_unless_empty()?;
+                statement.format(out)?;
             }
             ElementSpec::Literal(ref line) => {
-                out.write_str(&format!("{}{}", current, line))?;
-                out.new_line()?;
+                out.new_line_unless_empty()?;
+                out.write_str(line)?;
             }
             ElementSpec::Elements(ref elements) => {
                 for element in elements {
-                    element.format(current, indent, out)?;
+                    element.format(out)?;
                 }
             }
             ElementSpec::Nested(ref element) => {
-                let next_current = format!("{}{}", current, indent);
-                element.format(&next_current, indent, out)?;
+                out.new_line_unless_empty()?;
+
+                out.indent();
+                element.format(out)?;
+                out.unindent();
             }
             ElementSpec::Spacing => {
+                out.new_line_unless_empty()?;
                 out.new_line()?;
             }
         };
@@ -63,128 +60,22 @@ impl<'a> From<&'a str> for ElementSpec {
     }
 }
 
-impl From<FunctionSpec> for ElementSpec {
-    fn from(value: FunctionSpec) -> ElementSpec {
-        let mut open = Statement::new();
-        open.push("function ");
-        open.push(value.name);
-        open.push("(");
-
-        let mut arguments = Statement::new();
-
-        for argument in value.arguments {
-            arguments.push(argument);
-        }
-
-        open.push(arguments.join(", "));
-        open.push(") {");
-
-        let mut out = Elements::new();
-        out.push(open);
-        out.push_nested(value.elements.join(ElementSpec::Spacing));
-        out.push("}");
-
-        out.into()
-    }
-}
-
-impl From<ClassSpec> for ElementSpec {
-    fn from(value: ClassSpec) -> ElementSpec {
-        let mut open = Statement::new();
-
-        open.push("class ");
-        open.push(value.name);
-        open.push(" {");
-
-        let mut body = Elements::new();
-
-        if !value.constructors.is_empty() {
-            body.push(value.constructors.join(ElementSpec::Spacing));
-        }
-
-        if !value.elements.is_empty() {
-            body.push(value.elements.join(ElementSpec::Spacing));
-        }
-
-        let mut out = Elements::new();
-        out.push(open);
-        out.push_nested(body.join(ElementSpec::Spacing));
-        out.push("}");
-
-        out.into()
-    }
-}
-
-impl From<MethodSpec> for ElementSpec {
-    fn from(value: MethodSpec) -> ElementSpec {
-        let mut open = Statement::new();
-
-        let mut arguments = Statement::new();
-
-        for argument in value.arguments {
-            arguments.push(argument);
-        }
-
-        if value.is_static {
-            open.push("static ");
-        }
-
-        open.push(value.name);
-        open.push("(");
-        open.push(arguments.join(", "));
-        open.push(")");
-
-        open.push(" {");
-
-        let mut out = Elements::new();
-        out.push(open);
-        out.push_nested(value.elements.join(ElementSpec::Spacing));
-        out.push("}");
-
-        out.into()
-    }
-}
-
-impl From<ConstructorSpec> for ElementSpec {
-    fn from(value: ConstructorSpec) -> ElementSpec {
-        let mut open = Statement::new();
-
-        let mut arguments = Statement::new();
-
-        for argument in value.arguments {
-            arguments.push(argument);
-        }
-
-        open.push("constructor(");
-        open.push(arguments.join(", "));
-        open.push(")");
-
-        open.push(" {");
-
-        let mut out = Elements::new();
-
-        out.push(open);
-        out.push_nested(value.elements.join(ElementSpec::Spacing));
-        out.push("}");
-
-        out.into()
-    }
-}
-
 impl From<Statement> for ElementSpec {
     fn from(value: Statement) -> ElementSpec {
         ElementSpec::Statement(value)
     }
 }
 
-impl From<Elements> for ElementSpec {
-    fn from(value: Elements) -> ElementSpec {
-        ElementSpec::Elements(value.elements)
-    }
-}
-
 impl From<Vec<String>> for ElementSpec {
     fn from(value: Vec<String>) -> ElementSpec {
         ElementSpec::Elements(value.into_iter().map(ElementSpec::Literal).collect())
+    }
+}
+
+impl ToString for ElementSpec {
+    fn to_string(&self) -> String {
+        let mut s = String::new();
+        self.format(&mut ::common::ElementFormatter::new(&mut s)).unwrap();
+        s
     }
 }

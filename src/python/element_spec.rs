@@ -1,5 +1,5 @@
-use errors::*;
 use common::ElementFormat;
+use errors::*;
 use super::class_spec::ClassSpec;
 use super::decorator_spec::DecoratorSpec;
 use super::elements::Elements;
@@ -16,30 +16,32 @@ pub enum ElementSpec {
 }
 
 impl ElementSpec {
-    pub fn format<E>(&self, current: &str, indent: &str, out: &mut E) -> Result<()>
+    pub fn format<E>(&self, out: &mut E) -> Result<()>
         where E: ElementFormat
     {
         match *self {
             ElementSpec::Statement(ref statement) => {
-                for line in statement.format() {
-                    out.write_str(&format!("{}{}", current, line))?;
-                    out.new_line()?;
-                }
+                out.new_line_unless_empty()?;
+                statement.format(out)?;
             }
             ElementSpec::Literal(ref line) => {
-                out.write_str(&format!("{}{}", current, line))?;
-                out.new_line()?;
+                out.new_line_unless_empty()?;
+                out.write_str(line)?;
             }
             ElementSpec::Elements(ref elements) => {
                 for element in elements {
-                    element.format(current, indent, out)?;
+                    element.format(out)?;
                 }
             }
             ElementSpec::Nested(ref element) => {
-                let next_current = format!("{}{}", current, indent);
-                element.format(&next_current, indent, out)?;
+                out.new_line_unless_empty()?;
+
+                out.indent();
+                element.format(out)?;
+                out.unindent();
             }
             ElementSpec::Spacing => {
+                out.new_line_unless_empty()?;
                 out.new_line()?;
             }
         }
@@ -161,5 +163,13 @@ impl From<Elements> for ElementSpec {
 impl From<Vec<String>> for ElementSpec {
     fn from(value: Vec<String>) -> ElementSpec {
         ElementSpec::Elements(value.into_iter().map(ElementSpec::Literal).collect())
+    }
+}
+
+impl ToString for ElementSpec {
+    fn to_string(&self) -> String {
+        let mut s = String::new();
+        self.format(&mut ::common::ElementFormatter::new(&mut s)).unwrap();
+        s
     }
 }

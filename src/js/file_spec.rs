@@ -1,3 +1,4 @@
+use errors::*;
 use common::ElementFormatter;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
@@ -6,7 +7,8 @@ use super::element_spec::ElementSpec;
 use super::elements::Elements;
 use super::imports::{Imports, ImportReceiver};
 use super::name::ImportedName;
-use super::statement::{self, Statement};
+use super::statement::Statement;
+use super::variable::Variable;
 
 #[derive(Debug, Clone)]
 pub struct FileSpec {
@@ -29,7 +31,7 @@ impl FileSpec {
         format!("{}.js", parts.join("/"))
     }
 
-    fn imports(&self) -> Elements {
+    fn imports(&self) -> Option<Elements> {
         let mut imports = BTreeSet::new();
         self.elements.imports(&mut imports);
 
@@ -53,6 +55,10 @@ impl FileSpec {
             }
         }
 
+        if collected.is_empty() && wildcard.is_empty() {
+            return None;
+        }
+
         let mut out = Elements::new();
 
         for (module, names) in collected {
@@ -63,7 +69,7 @@ impl FileSpec {
             stmt.push(names.join(", "));
             stmt.push("}");
             stmt.push(" from ");
-            stmt.push(statement::quote_string(&self.module_to_path(&module)));
+            stmt.push(Variable::String(self.module_to_path(&module)));
             stmt.push(";");
 
             out.push(stmt);
@@ -75,31 +81,45 @@ impl FileSpec {
             stmt.push("import * as ");
             stmt.push(alias);
             stmt.push(" from ");
-            stmt.push(statement::quote_string(&self.module_to_path(&module)));
+            stmt.push(Variable::String(self.module_to_path(&module)));
             stmt.push(";");
 
             out.push(stmt);
         }
 
-        out
+        Some(out)
     }
 
-    pub fn format(&self) -> String {
-        let mut out = Elements::new();
+    pub fn format<W>(&self, out: &mut W) -> Result<()>
+        where W: ::std::fmt::Write
+    {
+        let mut elements = Elements::new();
 
-        out.push(self.imports());
-        out.push(self.elements.clone().join(ElementSpec::Spacing));
+        if let Some(imports) = self.imports() {
+            elements.push(imports);
+        }
 
-        let elements: ElementSpec = out.join(ElementSpec::Spacing).into();
+        elements.push(self.elements.clone().join(ElementSpec::Spacing));
 
-        let mut s = String::new();
-        elements.format("", "  ", &mut ElementFormatter::new(&mut s)).unwrap();
-        s
+        let elements: ElementSpec = elements.join(ElementSpec::Spacing).into();
+
+        elements.format(&mut ElementFormatter::new(out))?;
+        out.write_char('\n')?;
+
+        Ok(())
     }
 }
 
 impl ImportReceiver for BTreeSet<ImportedName> {
     fn receive(&mut self, name: &ImportedName) {
         self.insert(name.clone());
+    }
+}
+
+impl ToString for FileSpec {
+    fn to_string(&self) -> String {
+        let mut s = String::new();
+        self.format(&mut s).unwrap();
+        s
     }
 }

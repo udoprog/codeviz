@@ -1,3 +1,4 @@
+use errors::*;
 use common::ElementFormatter;
 use super::_type::ClassType;
 use super::element_spec::ElementSpec;
@@ -27,7 +28,9 @@ impl FileSpec {
         self.elements.push(element);
     }
 
-    pub fn format(&self) -> String {
+    pub fn format<'a, W>(&'a self, out: &mut W) -> Result<()>
+        where W: ::std::fmt::Write
+    {
         let mut file = Elements::new();
 
         let mut package = Statement::new();
@@ -70,16 +73,23 @@ impl FileSpec {
 
         let file: ElementSpec = file.join(ElementSpec::Spacing).into();
 
-        let mut s = String::new();
-        // TODO: do not unwrap
-        file.format(&mut ElementFormatter::new(&mut s)).unwrap();
-        s.push('\n');
-        s
+        file.format(&mut ElementFormatter::new(out))?;
+        out.write_char('\n')?;
+
+        Ok(())
     }
 }
 
 impl ImportReceiver for BTreeSet<ClassType> {
     fn receive(&mut self, ty: &ClassType) {
         self.insert(ty.clone());
+    }
+}
+
+impl ToString for FileSpec {
+    fn to_string(&self) -> String {
+        let mut s = String::new();
+        self.format(&mut s).unwrap();
+        s
     }
 }

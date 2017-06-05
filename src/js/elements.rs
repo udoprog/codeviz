@@ -49,3 +49,9 @@ impl Elements {
         parts
     }
 }
+
+impl From<Elements> for ElementSpec {
+    fn from(value: Elements) -> ElementSpec {
+        ElementSpec::Elements(value.elements)
+    }
+}

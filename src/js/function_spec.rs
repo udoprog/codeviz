@@ -30,3 +30,28 @@ impl FunctionSpec {
         self.elements.push(element);
     }
 }
+
+impl From<FunctionSpec> for ElementSpec {
+    fn from(value: FunctionSpec) -> ElementSpec {
+        let mut open = Statement::new();
+        open.push("function ");
+        open.push(value.name);
+        open.push("(");
+
+        let mut arguments = Statement::new();
+
+        for argument in value.arguments {
+            arguments.push(argument);
+        }
+
+        open.push(arguments.join(", "));
+        open.push(") {");
+
+        let mut out = Elements::new();
+        out.push(open);
+        out.push_nested(value.elements.join(ElementSpec::Spacing));
+        out.push("}");
+
+        out.into()
+    }
+}

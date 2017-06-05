@@ -28,3 +28,29 @@ impl ConstructorSpec {
         self.elements.push(element);
     }
 }
+
+impl From<ConstructorSpec> for ElementSpec {
+    fn from(value: ConstructorSpec) -> ElementSpec {
+        let mut open = Statement::new();
+
+        let mut arguments = Statement::new();
+
+        for argument in value.arguments {
+            arguments.push(argument);
+        }
+
+        open.push("constructor(");
+        open.push(arguments.join(", "));
+        open.push(")");
+
+        open.push(" {");
+
+        let mut out = Elements::new();
+
+        out.push(open);
+        out.push_nested(value.elements.join(ElementSpec::Spacing));
+        out.push("}");
+
+        out.into()
+    }
+}

@@ -1,28 +1,30 @@
+use errors::*;
+use common::ElementFormat;
 use super::variable::Variable;
 
 /// Quote a string to make it suitable as a literal Python string.
-fn quote_string(input: &str) -> String {
-    let mut out = String::new();
-    let mut it = input.chars();
+fn quote_string<E>(out: &mut E, input: &str) -> Result<()>
+    where E: ElementFormat
+{
+    out.write_char('"')?;
 
-    out.push('"');
-
-    while let Some(c) = it.next() {
+    for c in input.chars() {
         match c {
-            '\t' => out.push_str("\\t"),
-            '\u{0007}' => out.push_str("\\b"),
-            '\n' => out.push_str("\\n"),
-            '\r' => out.push_str("\\r"),
-            '\u{0014}' => out.push_str("\\f"),
-            '\'' => out.push_str("\\'"),
-            '"' => out.push_str("\\\""),
-            '\\' => out.push_str("\\\\"),
-            c => out.push(c),
-        }
+            '\t' => out.write_str("\\t"),
+            '\u{0007}' => out.write_str("\\b"),
+            '\n' => out.write_str("\\n"),
+            '\r' => out.write_str("\\r"),
+            '\u{0014}' => out.write_str("\\f"),
+            '\'' => out.write_str("\\'"),
+            '"' => out.write_str("\\\""),
+            '\\' => out.write_str("\\\\"),
+            c => out.write_char(c),
+        }?;
     }
 
-    out.push('"');
-    out
+    out.write_char('"')?;
+
+    Ok(())
 }
 
 /// A single statement, made up by variables.
@@ -65,33 +67,27 @@ impl Statement {
         Statement { parts: parts }
     }
 
-    pub fn format(&self) -> Vec<String> {
-        let mut out: Vec<String> = Vec::new();
-        let mut current: Vec<String> = Vec::new();
-
+    pub fn format<E>(&self, out: &mut E) -> Result<()>
+        where E: ElementFormat
+    {
         for part in &self.parts {
             match *part {
                 Variable::String(ref string) => {
-                    current.push(quote_string(string));
+                    quote_string(out, string)?;
                 }
                 Variable::Statement(ref stmt) => {
-                    current.push(stmt.format().join(" "));
+                    stmt.format(out)?;
                 }
                 Variable::Literal(ref content) => {
-                    current.push(content.to_owned());
+                    out.write_str(content)?;
                 }
                 Variable::Name(ref name) => {
-                    current.push(name.format());
+                    name.format(out)?;
                 }
             }
         }
 
-        if !current.is_empty() {
-            out.push(current.join(""));
-            current.clear();
-        }
-
-        out
+        Ok(())
     }
 }
 
