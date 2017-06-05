@@ -1,4 +1,4 @@
-use common::ElementFormat;
+use common::ElementFormatter;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::collections::btree_map;
@@ -92,9 +92,9 @@ impl FileSpec {
 
         let elements: ElementSpec = out.join(ElementSpec::Spacing).into();
 
-        let mut out = String::new();
-        elements.format("", "  ", &mut out);
-        out.end()
+        let mut s = String::new();
+        elements.format("", "  ", &mut ElementFormatter::new(&mut s)).unwrap();
+        s
     }
 }
 

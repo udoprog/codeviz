@@ -1,4 +1,4 @@
-use common::ElementFormat;
+use common::ElementFormatter;
 use super::_type::ClassType;
 use super::element_spec::ElementSpec;
 use super::elements::Elements;
@@ -70,9 +70,11 @@ impl FileSpec {
 
         let file: ElementSpec = file.join(ElementSpec::Spacing).into();
 
-        let mut out = String::new();
-        file.format("", "  ", &mut out);
-        out.end()
+        let mut s = String::new();
+        // TODO: do not unwrap
+        file.format(&mut ElementFormatter::new(&mut s)).unwrap();
+        s.push('\n');
+        s
     }
 }
 

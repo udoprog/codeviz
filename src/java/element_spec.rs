@@ -1,3 +1,4 @@
+use errors::*;
 use common::ElementFormat;
 use super::_type::ClassType;
 use super::annotation_spec::AnnotationSpec;
@@ -21,36 +22,40 @@ pub enum ElementSpec {
 }
 
 impl ElementSpec {
-    pub fn format<E>(&self, current: &str, indent: &str, out: &mut E)
+    pub fn format<E>(&self, out: &mut E) -> Result<()>
         where E: ElementFormat
     {
         match *self {
             ElementSpec::Push(ref statement) => {
-                for line in statement.format(0usize) {
-                    out.push(&format!("{}{}", current, line));
-                }
+                out.new_line_unless_empty()?;
+                statement.format(out, 0usize)?;
             }
             ElementSpec::Concat(ref statement) => {
-                for line in statement.format(0usize) {
-                    out.concat(&line);
-                }
+                statement.format(out, 0usize)?;
             }
             ElementSpec::Literal(ref line) => {
-                out.push(&format!("{}{}", current, line));
+                out.new_line_unless_empty()?;
+                out.write_str(line)?;
             }
             ElementSpec::Elements(ref elements) => {
                 for element in elements {
-                    element.format(current, indent, out)
+                    element.format(out)?;
                 }
             }
             ElementSpec::Nested(ref element) => {
-                let next_current = format!("{}{}", current, indent);
-                element.format(&next_current, indent, out)
+                out.new_line_unless_empty()?;
+
+                out.indent();
+                element.format(out)?;
+                out.unindent();
             }
             ElementSpec::Spacing => {
-                out.push("");
+                out.new_line_unless_empty()?;
+                out.new_line()?;
             }
-        };
+        }
+
+        Ok(())
     }
 
     fn implements<'a, I>(implements: I, dest: &mut Statement)
@@ -68,14 +73,6 @@ impl ElementSpec {
                 dest.push(next);
             }
         }
-    }
-}
-
-impl ToString for ElementSpec {
-    fn to_string(&self) -> String {
-        let mut out = String::new();
-        self.format("", "  ", &mut out);
-        out.end()
     }
 }
 

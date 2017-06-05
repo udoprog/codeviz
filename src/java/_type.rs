@@ -1,3 +1,6 @@
+use errors::*;
+use common::ElementFormat;
+
 /// Complete types, including generic arguments.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
 pub struct ClassType {
@@ -32,28 +35,28 @@ impl ClassType {
         ClassType::new(&self.package, &self.name, vec![])
     }
 
-    pub fn format(&self, level: usize) -> String {
-        let mut out = String::new();
-
-        out.push_str(&self.name);
+    pub fn format(&self, out: &mut ElementFormat, level: usize) -> Result<()> {
+        out.write_str(&self.name)?;
 
         if !self.arguments.is_empty() {
-            let mut arguments = Vec::new();
+            let mut it = self.arguments.iter().peekable();
 
             let level = level + 1;
 
-            for g in &self.arguments {
-                arguments.push(g.format(level));
+            out.write_char('<')?;
+
+            while let Some(g) = it.next() {
+                g.format(out, level)?;
+
+                if it.peek().is_some() {
+                    out.write_str(", ")?;
+                }
             }
 
-            let joined = arguments.join(", ");
-
-            out.push('<');
-            out.push_str(&joined);
-            out.push('>');
+            out.write_char('>')?;
         }
 
-        out
+        Ok(())
     }
 }
 
@@ -67,8 +70,9 @@ impl Local {
         Local { name: name.to_owned() }
     }
 
-    pub fn format(&self, _level: usize) -> String {
-        self.name.clone()
+    pub fn format(&self, out: &mut ElementFormat) -> Result<()> {
+        out.write_str(&self.name)?;
+        Ok(())
     }
 }
 
@@ -79,12 +83,14 @@ pub struct PrimitiveType<'a> {
 }
 
 impl<'a> PrimitiveType<'a> {
-    pub fn format(&self, level: usize) -> String {
+    pub fn format(&self, out: &mut ElementFormat, level: usize) -> Result<()> {
         if level <= 0 {
-            self.primitive.to_owned()
+            out.write_str(&self.primitive)?;
         } else {
-            self.boxed.to_owned()
+            out.write_str(&self.boxed)?;
         }
+
+        Ok(())
     }
 
     pub fn as_boxed(&self) -> ClassType {
@@ -109,11 +115,11 @@ impl Type {
         Local::new(name)
     }
 
-    pub fn format(&self, level: usize) -> String {
+    pub fn format(&self, out: &mut ElementFormat, level: usize) -> Result<()> {
         match *self {
-            Type::Primitive(ref primitive) => primitive.format(level),
-            Type::Class(ref class) => class.format(level),
-            Type::Local(ref local) => local.format(level),
+            Type::Primitive(ref primitive) => primitive.format(out, level),
+            Type::Class(ref class) => class.format(out, level),
+            Type::Local(ref local) => local.format(out),
         }
     }
 }

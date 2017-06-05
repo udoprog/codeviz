@@ -1,4 +1,4 @@
-use common::ElementFormat;
+use common::ElementFormatter;
 use super::element_spec::ElementSpec;
 use super::elements::Elements;
 use super::imports::{Imports, ImportReceiver};
@@ -22,7 +22,7 @@ impl FileSpec {
     }
 
     pub fn format(&self) -> String {
-        let mut out = String::new();
+        let mut s = String::new();
 
         let mut imports = BTreeSet::new();
 
@@ -33,22 +33,21 @@ impl FileSpec {
 
         if !modules.is_empty() {
             for (module, alias) in modules {
-                out.push_str("import ");
-                out.push_str(&module);
+                s.push_str("import ");
+                s.push_str(&module);
 
                 if let Some(ref alias) = alias {
-                    out.push_str(" as ");
-                    out.push_str(alias);
+                    s.push_str(" as ");
+                    s.push_str(alias);
                 }
 
-                out.push('\n');
+                s.push('\n');
             }
         }
 
         let elements: ElementSpec = self.elements.clone().join(ElementSpec::Spacing).into();
-
-        elements.format("", "  ", &mut out);
-        out.end()
+        elements.format("", "  ", &mut ElementFormatter::new(&mut s)).unwrap();
+        s
     }
 }
 
