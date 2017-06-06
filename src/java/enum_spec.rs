@@ -2,7 +2,7 @@ use super::_type::ClassType;
 use super::annotation_spec::AnnotationSpec;
 use super::common::implements;
 use super::constructor_spec::ConstructorSpec;
-use super::element::Element;
+use super::element::*;
 use super::elements::Elements;
 use super::field_spec::FieldSpec;
 use super::modifier::Modifiers;
@@ -79,14 +79,14 @@ impl From<EnumSpec> for Element {
             let mut comma = Statement::new();
             comma.push(",");
 
-            value_joiner.push(Element::Concat(comma));
+            value_joiner.push(Concat(comma));
 
             values.push(value.values.join(value_joiner));
 
             let mut endl = Statement::new();
             endl.push(";");
 
-            values.push(Element::Concat(endl));
+            values.push(Concat(endl));
 
             enum_body.push(values);
         }
@@ -103,7 +103,7 @@ impl From<EnumSpec> for Element {
             enum_body.push(fields);
         }
 
-        for constructor in &value.constructors {
+        for constructor in value.constructors {
             enum_body.push(constructor.as_element(&value.name));
         }
 
@@ -111,7 +111,7 @@ impl From<EnumSpec> for Element {
             enum_body.push(element);
         }
 
-        elements.push_nested(enum_body.join(Element::Spacing));
+        elements.push_nested(enum_body.join(Spacing));
         elements.push("}");
 
         elements.into()

@@ -1,10 +1,7 @@
 use common::ElementFormat;
+use common::VariableFormat;
 use errors::*;
-use super::_type::{Type, ClassType};
-use super::annotation_spec::AnnotationSpec;
-use super::argument_spec::ArgumentSpec;
-use super::field_spec::FieldSpec;
-use super::modifier::Modifiers;
+use super::_type::Type;
 use super::statement::Statement;
 
 #[derive(Debug, Clone)]
@@ -16,8 +13,10 @@ pub enum Variable {
     Spacing,
 }
 
-impl Variable {
-    pub fn format(&self, out: &mut ElementFormat, level: usize) -> Result<()> {
+impl VariableFormat for Variable {
+    fn format<E>(&self, out: &mut E, level: usize) -> Result<()>
+        where E: ElementFormat
+    {
         match *self {
             Variable::Type(ref ty) => ty.format(out, level)?,
             Variable::String(ref string) => java_quote_string(out, string)?,
@@ -53,42 +52,6 @@ impl From<String> for Variable {
 impl From<Statement> for Variable {
     fn from(value: Statement) -> Variable {
         Variable::Statement(value)
-    }
-}
-
-impl From<FieldSpec> for Variable {
-    fn from(value: FieldSpec) -> Variable {
-        Variable::Literal(value.name)
-    }
-}
-
-impl From<ArgumentSpec> for Variable {
-    fn from(value: ArgumentSpec) -> Variable {
-        Variable::Literal(value.name)
-    }
-}
-
-impl From<Modifiers> for Variable {
-    fn from(value: Modifiers) -> Variable {
-        Variable::Literal(value.format())
-    }
-}
-
-impl From<Type> for Variable {
-    fn from(value: Type) -> Variable {
-        Variable::Type(value)
-    }
-}
-
-impl From<ClassType> for Variable {
-    fn from(value: ClassType) -> Variable {
-        Variable::Type(value.into())
-    }
-}
-
-impl From<AnnotationSpec> for Variable {
-    fn from(value: AnnotationSpec) -> Variable {
-        Variable::Statement(value.into())
     }
 }
 

@@ -8,7 +8,8 @@ use super::variable_format::VariableFormat;
 pub enum Element<Var>
     where Var: VariableFormat
 {
-    Statement(Statement<Var>),
+    Push(Statement<Var>),
+    Concat(Statement<Var>),
     Literal(String),
     Elements(Vec<Element<Var>>),
     Nested(Box<Element<Var>>),
@@ -22,8 +23,11 @@ impl<Var> Element<Var>
         where E: ElementFormat
     {
         match *self {
-            Element::Statement(ref statement) => {
+            Element::Push(ref statement) => {
                 out.new_line_unless_empty()?;
+                statement.format(out, 0usize)?;
+            }
+            Element::Concat(ref statement) => {
                 statement.format(out, 0usize)?;
             }
             Element::Literal(ref line) => {

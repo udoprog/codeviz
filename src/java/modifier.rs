@@ -1,4 +1,5 @@
 use std::collections::BTreeSet;
+use super::variable::Variable;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash)]
 pub enum Modifier {
@@ -49,5 +50,11 @@ impl Modifiers {
 
     pub fn contains(&self, modifier: &Modifier) -> bool {
         self.modifiers.contains(modifier)
+    }
+}
+
+impl From<Modifiers> for Variable {
+    fn from(value: Modifiers) -> Variable {
+        Variable::Literal(value.format())
     }
 }

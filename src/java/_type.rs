@@ -1,5 +1,6 @@
 use errors::*;
 use common::ElementFormat;
+use super::variable::Variable;
 
 /// Complete types, including generic arguments.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
@@ -137,6 +138,12 @@ impl<'a, A> From<&'a A> for Type
 {
     fn from(value: &'a A) -> Type {
         value.clone().into()
+    }
+}
+
+impl From<Type> for Variable {
+    fn from(value: Type) -> Variable {
+        Variable::Type(value)
     }
 }
 

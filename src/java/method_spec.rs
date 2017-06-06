@@ -1,7 +1,8 @@
 use super::_type::{ClassType, Type};
 use super::annotation_spec::AnnotationSpec;
 use super::argument_spec::ArgumentSpec;
-use super::element::Element;
+use super::common::join_statements;
+use super::element::*;
 use super::elements::Elements;
 use super::modifier::Modifiers;
 use super::statement::Statement;
@@ -88,7 +89,7 @@ impl From<MethodSpec> for Element {
         open.push("(");
 
         if !value.arguments.is_empty() {
-            open.push(Statement::join_statements(&value.arguments, ", "));
+            open.push(join_statements(value.arguments, ", "));
         }
 
         open.push(")");
@@ -109,7 +110,7 @@ impl From<MethodSpec> for Element {
             open.push(" {");
 
             elements.push(open);
-            elements.push_nested(value.elements.join(Element::Spacing));
+            elements.push_nested(value.elements.join(Spacing));
             elements.push("}");
         } else {
             open.push(";");

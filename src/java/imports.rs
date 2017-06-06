@@ -1,5 +1,5 @@
 use super::_type::{Type, ClassType};
-use super::element::Element;
+use super::element::*;
 use super::elements::Elements;
 use super::statement::Statement;
 use super::variable::Variable;
@@ -26,10 +26,10 @@ impl Imports for Element {
         where I: ImportReceiver
     {
         match *self {
-            Element::Elements(ref elements) => receiver.import_all(elements),
-            Element::Push(ref statement) => statement.imports(receiver),
-            Element::Concat(ref statement) => statement.imports(receiver),
-            Element::Nested(ref nested) => {
+            Elements(ref elements) => receiver.import_all(elements),
+            Push(ref statement) => statement.imports(receiver),
+            Concat(ref statement) => statement.imports(receiver),
+            Nested(ref nested) => {
                 (*nested).imports(receiver);
             }
             _ => {}

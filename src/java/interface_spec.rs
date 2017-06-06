@@ -1,6 +1,6 @@
 use super::_type::ClassType;
 use super::annotation_spec::AnnotationSpec;
-use super::element::Element;
+use super::element::*;
 use super::elements::Elements;
 use super::modifier::Modifiers;
 use super::statement::Statement;
@@ -68,7 +68,7 @@ impl From<InterfaceSpec> for Element {
         open.push(" {");
 
         elements.push(open);
-        elements.push_nested(value.elements.join(Element::Spacing));
+        elements.push_nested(value.elements.join(Spacing));
         elements.push("}");
 
         elements.into()

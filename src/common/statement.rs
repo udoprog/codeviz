@@ -65,10 +65,25 @@ impl<'a, T, Var> From<&'a T> for Statement<Var>
     }
 }
 
+impl<S, Var> From<Vec<S>> for Statement<Var>
+    where Var: VariableFormat,
+          S: Into<Var>
+{
+    fn from(values: Vec<S>) -> Statement<Var> {
+        let mut s = Statement::new();
+
+        for value in values {
+            s.push(value);
+        }
+
+        s
+    }
+}
+
 impl<Var> From<Statement<Var>> for Element<Var>
     where Var: VariableFormat
 {
     fn from(value: Statement<Var>) -> Element<Var> {
-        Element::Statement(value)
+        Element::Push(value)
     }
 }

@@ -1,6 +1,8 @@
 use super::_type::Type;
 use super::annotation_spec::AnnotationSpec;
 use super::modifier::Modifiers;
+use super::statement::Statement;
+use super::variable::Variable;
 
 #[derive(Debug, Clone)]
 pub struct ArgumentSpec {
@@ -32,5 +34,33 @@ impl<'a, A> From<&'a A> for ArgumentSpec
 {
     fn from(value: &'a A) -> ArgumentSpec {
         value.clone().into()
+    }
+}
+
+impl From<ArgumentSpec> for Variable {
+    fn from(value: ArgumentSpec) -> Variable {
+        Variable::Literal(value.name)
+    }
+}
+
+impl From<ArgumentSpec> for Statement {
+    fn from(value: ArgumentSpec) -> Statement {
+        let mut s = Statement::new();
+
+        for a in &value.annotations {
+            s.push(a);
+            s.push(" ");
+        }
+
+        if !value.modifiers.is_empty() {
+            s.push(value.modifiers);
+            s.push(" ");
+        }
+
+        s.push(value.ty);
+        s.push(" ");
+        s.push(value.name);
+
+        s
     }
 }

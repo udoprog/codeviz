@@ -62,7 +62,7 @@ impl Imports for Element {
         where I: ImportReceiver
     {
         match *self {
-            Statement(ref statement) => {
+            Push(ref statement) => {
                 statement.imports(receiver);
             }
             Elements(ref elements) => {

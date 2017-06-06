@@ -127,6 +127,8 @@ mod java_tests {
         let mut file = FileSpec::new("se.tedro");
         file.push(&class);
 
+        println!("result = {}", file.to_string());
+
         let reference = ::std::str::from_utf8(include_bytes!("tests/Test.java")).unwrap();
         assert_eq!(reference, file.to_string());
     }

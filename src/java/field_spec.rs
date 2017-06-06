@@ -1,6 +1,7 @@
 use super::_type::Type;
 use super::modifier::Modifiers;
 use super::statement::Statement;
+use super::variable::Variable;
 
 #[derive(Debug, Clone)]
 pub struct FieldSpec {
@@ -34,5 +35,33 @@ impl<'a, T> From<&'a T> for FieldSpec
 {
     fn from(value: &'a T) -> FieldSpec {
         value.clone().into()
+    }
+}
+
+impl From<FieldSpec> for Variable {
+    fn from(value: FieldSpec) -> Variable {
+        Variable::Literal(value.name)
+    }
+}
+
+impl From<FieldSpec> for Statement {
+    fn from(value: FieldSpec) -> Statement {
+        let mut s = Statement::new();
+
+        if !value.modifiers.is_empty() {
+            s.push(value.modifiers);
+            s.push(" ");
+        }
+
+        s.push(value.ty);
+        s.push(" ");
+        s.push(value.name);
+
+        if let Some(initialize) = value.initialize {
+            s.push(" = ");
+            s.push(initialize);
+        }
+
+        s
     }
 }

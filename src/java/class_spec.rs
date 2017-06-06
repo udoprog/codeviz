@@ -2,11 +2,12 @@ use super::_type::ClassType;
 use super::annotation_spec::AnnotationSpec;
 use super::common::implements;
 use super::constructor_spec::ConstructorSpec;
-use super::element::Element;
+use super::element::*;
 use super::elements::Elements;
 use super::field_spec::FieldSpec;
 use super::modifier::Modifiers;
 use super::statement::Statement;
+use super::variable::Variable;
 
 #[derive(Debug, Clone)]
 pub struct ClassSpec {
@@ -84,7 +85,7 @@ impl From<ClassSpec> for Element {
             class_body.push(fields);
         }
 
-        for constructor in &value.constructors {
+        for constructor in value.constructors {
             class_body.push(constructor.as_element(&value.name));
         }
 
@@ -92,9 +93,15 @@ impl From<ClassSpec> for Element {
             class_body.push(element);
         }
 
-        elements.push_nested(class_body.join(Element::Spacing));
+        elements.push_nested(class_body.join(Spacing));
         elements.push("}");
 
         elements.into()
+    }
+}
+
+impl From<ClassType> for Variable {
+    fn from(value: ClassType) -> Variable {
+        Variable::Type(value.into())
     }
 }

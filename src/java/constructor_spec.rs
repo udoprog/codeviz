@@ -1,6 +1,7 @@
 use super::_type::ClassType;
 use super::annotation_spec::AnnotationSpec;
 use super::argument_spec::ArgumentSpec;
+use super::common::join_statements;
 use super::element::Element;
 use super::elements::Elements;
 use super::modifier::Modifiers;
@@ -50,23 +51,23 @@ impl ConstructorSpec {
         self.elements.push(element);
     }
 
-    pub fn as_element(&self, enclosing: &str) -> Element {
+    pub fn as_element(self, enclosing: &str) -> Element {
         let mut elements = Elements::new();
 
         let mut open = Statement::new();
 
-        for a in &self.annotations {
+        for a in self.annotations {
             elements.push(a);
         }
 
         if !self.modifiers.is_empty() {
-            open.push(&self.modifiers);
+            open.push(self.modifiers);
             open.push(" ");
         }
 
         open.push(enclosing);
         open.push("(");
-        open.push(Statement::join_statements(&self.arguments, ", "));
+        open.push(join_statements(self.arguments, ", "));
         open.push(")");
 
         if !self.throws.is_empty() {
@@ -74,7 +75,7 @@ impl ConstructorSpec {
 
             let mut arguments = Statement::new();
 
-            for throw in &self.throws {
+            for throw in self.throws {
                 arguments.push(throw);
             }
 
@@ -84,7 +85,7 @@ impl ConstructorSpec {
         open.push(" {");
 
         elements.push(open);
-        elements.push_nested(&self.elements);
+        elements.push_nested(self.elements);
         elements.push("}");
 
         elements.into()

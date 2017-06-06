@@ -1,7 +1,8 @@
 use super::_type::{Type, ClassType};
-use super::statement::Statement;
-use super::element::Element;
+use super::element::*;
 use super::elements::Elements;
+use super::statement::Statement;
+use super::variable::Variable;
 
 #[derive(Debug, Clone)]
 pub struct AnnotationSpec {
@@ -51,9 +52,11 @@ impl From<AnnotationSpec> for Element {
         if !value.arguments.is_empty() {
             let mut open = Statement::new();
 
+            let arguments: Statement = value.arguments.into();
+
             open.push(annotation);
             open.push("(");
-            open.push(Statement::join_with(&value.arguments, ", "));
+            open.push(arguments.join(", "));
             open.push(")");
 
             elements.push(open);
@@ -62,5 +65,19 @@ impl From<AnnotationSpec> for Element {
         }
 
         elements.into()
+    }
+}
+
+impl From<AnnotationSpec> for Variable {
+    fn from(value: AnnotationSpec) -> Variable {
+        Variable::Statement(value.into())
+    }
+}
+
+impl From<AnnotationSpec> for Statement {
+    fn from(value: AnnotationSpec) -> Statement {
+        let mut s = Statement::new();
+        s.push(value);
+        s
     }
 }
