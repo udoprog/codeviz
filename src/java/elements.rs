@@ -49,3 +49,9 @@ impl Elements {
         parts
     }
 }
+
+impl From<Elements> for Element {
+    fn from(value: Elements) -> Element {
+        Element::Elements(value.elements)
+    }
+}

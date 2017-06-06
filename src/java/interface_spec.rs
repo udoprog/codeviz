@@ -1,7 +1,9 @@
 use super::_type::ClassType;
 use super::annotation_spec::AnnotationSpec;
+use super::element::Element;
 use super::elements::Elements;
 use super::modifier::Modifiers;
+use super::statement::Statement;
 
 #[derive(Debug, Clone)]
 pub struct InterfaceSpec {
@@ -31,5 +33,44 @@ impl InterfaceSpec {
         where T: Into<ClassType>
     {
         self.extends.push(ty.into());
+    }
+}
+
+impl From<InterfaceSpec> for Element {
+    fn from(value: InterfaceSpec) -> Element {
+        let mut elements = Elements::new();
+
+        let mut open = Statement::new();
+
+        for a in &value.annotations {
+            elements.push(a);
+        }
+
+        if !value.modifiers.is_empty() {
+            open.push(value.modifiers);
+            open.push(" ");
+        }
+
+        open.push("interface ");
+        open.push(value.name);
+
+        if !value.extends.is_empty() {
+            let mut arguments = Statement::new();
+
+            for extends in &value.extends {
+                arguments.push(extends);
+            }
+
+            open.push(" extends ");
+            open.push(arguments.join(","));
+        }
+
+        open.push(" {");
+
+        elements.push(open);
+        elements.push_nested(value.elements.join(Element::Spacing));
+        elements.push("}");
+
+        elements.into()
     }
 }

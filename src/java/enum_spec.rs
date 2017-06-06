@@ -1,10 +1,12 @@
 use super::_type::ClassType;
 use super::annotation_spec::AnnotationSpec;
+use super::common::implements;
 use super::constructor_spec::ConstructorSpec;
 use super::element::Element;
 use super::elements::Elements;
 use super::field_spec::FieldSpec;
 use super::modifier::Modifiers;
+use super::statement::Statement;
 
 #[derive(Debug, Clone)]
 pub struct EnumSpec {
@@ -36,5 +38,82 @@ impl EnumSpec {
         where E: Into<Element>
     {
         self.values.push(value);
+    }
+}
+
+impl From<EnumSpec> for Element {
+    fn from(value: EnumSpec) -> Element {
+        let mut elements = Elements::new();
+
+        for a in &value.annotations {
+            elements.push(a);
+        }
+
+        // opening statement
+        {
+            let mut open = Statement::new();
+
+            if !value.modifiers.is_empty() {
+                open.push(value.modifiers);
+                open.push(" ");
+            }
+
+            open.push("enum ");
+            open.push(&value.name);
+
+            implements(&value.implements, &mut open);
+
+            open.push(" {");
+
+            elements.push(open);
+        }
+
+        let mut enum_body = Elements::new();
+
+        // enum values
+        {
+            let mut values = Elements::new();
+
+            let mut value_joiner = Elements::new();
+
+            let mut comma = Statement::new();
+            comma.push(",");
+
+            value_joiner.push(Element::Concat(comma));
+
+            values.push(value.values.join(value_joiner));
+
+            let mut endl = Statement::new();
+            endl.push(";");
+
+            values.push(Element::Concat(endl));
+
+            enum_body.push(values);
+        }
+
+        if !value.fields.is_empty() {
+            let mut fields = Elements::new();
+
+            for field in &value.fields {
+                let mut field: Statement = field.into();
+                field.push(";");
+                fields.push(field);
+            }
+
+            enum_body.push(fields);
+        }
+
+        for constructor in &value.constructors {
+            enum_body.push(constructor.as_element(&value.name));
+        }
+
+        for element in &value.elements.elements {
+            enum_body.push(element);
+        }
+
+        elements.push_nested(enum_body.join(Element::Spacing));
+        elements.push("}");
+
+        elements.into()
     }
 }

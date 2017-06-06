@@ -4,6 +4,7 @@ use super::argument_spec::ArgumentSpec;
 use super::element::Element;
 use super::elements::Elements;
 use super::modifier::Modifiers;
+use super::statement::Statement;
 
 #[derive(Debug, Clone)]
 pub struct MethodSpec {
@@ -57,5 +58,65 @@ impl MethodSpec {
         where E: Into<Element>
     {
         self.elements.push(element);
+    }
+}
+
+impl From<MethodSpec> for Element {
+    fn from(value: MethodSpec) -> Element {
+        let mut elements = Elements::new();
+
+        for a in &value.annotations {
+            elements.push(a);
+        }
+
+        let mut open = Statement::new();
+
+        if !value.modifiers.is_empty() {
+            open.push(value.modifiers);
+            open.push(" ");
+        }
+
+        match value.returns {
+            None => open.push("void "),
+            Some(ref returns) => {
+                open.push(returns);
+                open.push(" ");
+            }
+        }
+
+        open.push(value.name);
+        open.push("(");
+
+        if !value.arguments.is_empty() {
+            open.push(Statement::join_statements(&value.arguments, ", "));
+        }
+
+        open.push(")");
+
+        if !value.throws.is_empty() {
+            open.push(" throws ");
+
+            let mut arguments = Statement::new();
+
+            for throw in &value.throws {
+                arguments.push(throw);
+            }
+
+            open.push(arguments.join(", "));
+        }
+
+        if !value.elements.is_empty() {
+            open.push(" {");
+
+            elements.push(open);
+            elements.push_nested(value.elements.join(Element::Spacing));
+            elements.push("}");
+        } else {
+            open.push(";");
+
+            elements.push(open);
+        }
+
+        elements.into()
     }
 }

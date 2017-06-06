@@ -5,6 +5,7 @@ mod annotation_spec;
 mod argument_spec;
 mod class_like;
 mod class_spec;
+mod common;
 mod constructor_spec;
 mod container_spec;
 mod element;

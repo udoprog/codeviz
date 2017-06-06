@@ -2,30 +2,9 @@ use common::ElementFormat;
 use errors::*;
 use super::annotation_spec::AnnotationSpec;
 use super::argument_spec::ArgumentSpec;
+use super::element::Element;
 use super::field_spec::FieldSpec;
 use super::variable::Variable;
-
-fn java_quote_string(out: &mut ElementFormat, input: &str) -> Result<()> {
-    out.write_char('"')?;
-
-    for c in input.chars() {
-        match c {
-            '\t' => out.write_str("\\t")?,
-            '\u{0007}' => out.write_str("\\b")?,
-            '\n' => out.write_str("\\n")?,
-            '\r' => out.write_str("\\r")?,
-            '\u{0014}' => out.write_str("\\f")?,
-            '\'' => out.write_str("\\'")?,
-            '"' => out.write_str("\\\"")?,
-            '\\' => out.write_str("\\\\")?,
-            c => out.write_char(c)?,
-        }
-    }
-
-    out.write_char('"')?;
-
-    Ok(())
-}
 
 #[derive(Debug, Clone)]
 pub struct Statement {
@@ -101,13 +80,7 @@ impl Statement {
 
     pub fn format(&self, out: &mut ElementFormat, level: usize) -> Result<()> {
         for part in &self.parts {
-            match *part {
-                Variable::Type(ref ty) => ty.format(out, level)?,
-                Variable::String(ref string) => java_quote_string(out, string)?,
-                Variable::Statement(ref stmt) => stmt.format(out, level)?,
-                Variable::Literal(ref content) => out.write_str(content)?,
-                Variable::Spacing => out.new_line()?,
-            }
+            part.format(out, level)?;
         }
 
         Ok(())
@@ -192,5 +165,11 @@ impl From<Variable> for Statement {
         let mut stmt = Statement::new();
         stmt.push(value);
         stmt
+    }
+}
+
+impl From<Statement> for Element {
+    fn from(value: Statement) -> Element {
+        Element::Push(value)
     }
 }

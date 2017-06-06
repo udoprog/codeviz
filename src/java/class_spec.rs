@@ -1,9 +1,12 @@
 use super::_type::ClassType;
 use super::annotation_spec::AnnotationSpec;
+use super::common::implements;
 use super::constructor_spec::ConstructorSpec;
+use super::element::Element;
 use super::elements::Elements;
 use super::field_spec::FieldSpec;
 use super::modifier::Modifiers;
+use super::statement::Statement;
 
 #[derive(Debug, Clone)]
 pub struct ClassSpec {
@@ -35,5 +38,63 @@ impl ClassSpec {
         where T: Into<ClassType>
     {
         self.extends = Some(ty.into());
+    }
+}
+
+impl From<ClassSpec> for Element {
+    fn from(value: ClassSpec) -> Element {
+        let mut elements = Elements::new();
+
+        for a in &value.annotations {
+            elements.push(a);
+        }
+
+        let mut open = Statement::new();
+
+        if !value.modifiers.is_empty() {
+            open.push(value.modifiers);
+            open.push(" ");
+        }
+
+        open.push("class ");
+        open.push(&value.name);
+
+        if let Some(ref extends) = value.extends {
+            open.push(" extends ");
+            open.push(extends);
+        }
+
+        implements(&value.implements, &mut open);
+
+        open.push(" {");
+
+        elements.push(open);
+
+        let mut class_body = Elements::new();
+
+        if !value.fields.is_empty() {
+            let mut fields = Elements::new();
+
+            for field in &value.fields {
+                let mut field: Statement = field.into();
+                field.push(";");
+                fields.push(field);
+            }
+
+            class_body.push(fields);
+        }
+
+        for constructor in &value.constructors {
+            class_body.push(constructor.as_element(&value.name));
+        }
+
+        for element in &value.elements.elements {
+            class_body.push(element);
+        }
+
+        elements.push_nested(class_body.join(Element::Spacing));
+        elements.push("}");
+
+        elements.into()
     }
 }

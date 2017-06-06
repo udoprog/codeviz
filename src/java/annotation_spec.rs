@@ -1,5 +1,7 @@
 use super::_type::{Type, ClassType};
 use super::statement::Statement;
+use super::element::Element;
+use super::elements::Elements;
 
 #[derive(Debug, Clone)]
 pub struct AnnotationSpec {
@@ -35,5 +37,30 @@ impl<'a, T> From<&'a T> for AnnotationSpec
 impl From<ClassType> for AnnotationSpec {
     fn from(value: ClassType) -> AnnotationSpec {
         AnnotationSpec::new(value)
+    }
+}
+
+impl From<AnnotationSpec> for Element {
+    fn from(value: AnnotationSpec) -> Element {
+        let mut elements = Elements::new();
+
+        let mut annotation = Statement::new();
+        annotation.push("@");
+        annotation.push(value.ty);
+
+        if !value.arguments.is_empty() {
+            let mut open = Statement::new();
+
+            open.push(annotation);
+            open.push("(");
+            open.push(Statement::join_with(&value.arguments, ", "));
+            open.push(")");
+
+            elements.push(open);
+        } else {
+            elements.push(annotation);
+        }
+
+        elements.into()
     }
 }
