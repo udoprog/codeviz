@@ -3,7 +3,7 @@ use common::ElementFormatter;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::collections::btree_map;
-use super::element_spec::ElementSpec;
+use super::element::Element;
 use super::elements::Elements;
 use super::imports::{Imports, ImportReceiver};
 use super::name::ImportedName;
@@ -21,7 +21,7 @@ impl FileSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec>
+        where E: Into<Element>
     {
         self.elements.push(element);
     }
@@ -99,9 +99,9 @@ impl FileSpec {
             elements.push(imports);
         }
 
-        elements.push(self.elements.clone().join(ElementSpec::Spacing));
+        elements.push(self.elements.clone().join(Element::Spacing));
 
-        let elements: ElementSpec = elements.join(ElementSpec::Spacing).into();
+        let elements: Element = elements.join(Element::Spacing).into();
 
         elements.format(&mut ElementFormatter::new(out))?;
         out.write_char('\n')?;

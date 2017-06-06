@@ -1,11 +1,11 @@
-use super::element_spec::ElementSpec;
+use super::element::Element;
 use super::variable_format::VariableFormat;
 
 #[derive(Debug, Clone)]
 pub struct Elements<Var>
     where Var: VariableFormat
 {
-    pub elements: Vec<ElementSpec<Var>>,
+    pub elements: Vec<Element<Var>>,
 }
 
 impl<Var> Elements<Var>
@@ -16,15 +16,15 @@ impl<Var> Elements<Var>
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec<Var>>
+        where E: Into<Element<Var>>
     {
         self.elements.push(element.into());
     }
 
     pub fn push_nested<E>(&mut self, element: E)
-        where E: Into<ElementSpec<Var>>
+        where E: Into<Element<Var>>
     {
-        self.elements.push(ElementSpec::Nested(Box::new(element.into())));
+        self.elements.push(Element::Nested(Box::new(element.into())));
     }
 
     pub fn is_empty(&self) -> bool {
@@ -32,7 +32,7 @@ impl<Var> Elements<Var>
     }
 
     pub fn join<S>(self, separator: S) -> Elements<Var>
-        where S: Into<ElementSpec<Var>> + Clone
+        where S: Into<Element<Var>> + Clone
     {
         let mut it = self.elements.into_iter();
 

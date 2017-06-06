@@ -1,4 +1,4 @@
-use common::ElementSpec;
+use common::Element;
 use common::Statement;
 use super::class_spec::ClassSpec;
 use super::elements::Elements;
@@ -57,18 +57,18 @@ impl Imports for Statement<Variable> {
     }
 }
 
-impl Imports for ElementSpec<Variable> {
+impl Imports for Element<Variable> {
     fn imports<I>(&self, receiver: &mut I)
         where I: ImportReceiver
     {
         match *self {
-            ElementSpec::Statement(ref statement) => {
+            Element::Statement(ref statement) => {
                 statement.imports(receiver);
             }
-            ElementSpec::Elements(ref elements) => {
+            Element::Elements(ref elements) => {
                 receiver.import_all(elements);
             }
-            ElementSpec::Nested(ref element) => {
+            Element::Nested(ref element) => {
                 element.imports(receiver);
             }
             _ => {}

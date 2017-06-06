@@ -134,21 +134,21 @@ mod java_tests {
     #[test]
     fn test_class_spec() {
         let class = ClassSpec::new(mods![Modifier::Public], "Foo");
-        let class: ElementSpec = class.into();
+        let class: Element = class.into();
         assert_eq!("public class Foo {\n}", class.to_string());
     }
 
     #[test]
     fn test_interface_spec() {
         let class = InterfaceSpec::new(mods![Modifier::Public], "Foo");
-        let class: ElementSpec = class.into();
+        let class: Element = class.into();
         assert_eq!("public interface Foo {\n}", class.to_string());
     }
 
     #[test]
     fn test_enum_spec() {
         let class = EnumSpec::new(mods![Modifier::Public], "Foo");
-        let class: ElementSpec = class.into();
+        let class: Element = class.into();
         assert_eq!("public enum Foo {\n  ;\n}", class.to_string());
     }
 }

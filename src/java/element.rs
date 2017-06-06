@@ -10,46 +10,46 @@ use super::method_spec::MethodSpec;
 use super::statement::Statement;
 
 #[derive(Debug, Clone)]
-pub enum ElementSpec {
+pub enum Element {
     // push as individual line.
     Push(Statement),
     // concat to previous statement.
     Concat(Statement),
     Literal(String),
-    Elements(Vec<ElementSpec>),
-    Nested(Box<ElementSpec>),
+    Elements(Vec<Element>),
+    Nested(Box<Element>),
     Spacing,
 }
 
-impl ElementSpec {
+impl Element {
     pub fn format<E>(&self, out: &mut E) -> Result<()>
         where E: ElementFormat
     {
         match *self {
-            ElementSpec::Push(ref statement) => {
+            Element::Push(ref statement) => {
                 out.new_line_unless_empty()?;
                 statement.format(out, 0usize)?;
             }
-            ElementSpec::Concat(ref statement) => {
+            Element::Concat(ref statement) => {
                 statement.format(out, 0usize)?;
             }
-            ElementSpec::Literal(ref line) => {
+            Element::Literal(ref line) => {
                 out.new_line_unless_empty()?;
                 out.write_str(line)?;
             }
-            ElementSpec::Elements(ref elements) => {
+            Element::Elements(ref elements) => {
                 for element in elements {
                     element.format(out)?;
                 }
             }
-            ElementSpec::Nested(ref element) => {
+            Element::Nested(ref element) => {
                 out.new_line_unless_empty()?;
 
                 out.indent();
                 element.format(out)?;
                 out.unindent();
             }
-            ElementSpec::Spacing => {
+            Element::Spacing => {
                 out.new_line_unless_empty()?;
                 out.new_line()?;
             }
@@ -76,40 +76,40 @@ impl ElementSpec {
     }
 }
 
-impl<'a, T> From<&'a T> for ElementSpec
-    where T: Into<ElementSpec> + Clone
+impl<'a, T> From<&'a T> for Element
+    where T: Into<Element> + Clone
 {
-    fn from(value: &'a T) -> ElementSpec {
+    fn from(value: &'a T) -> Element {
         value.clone().into()
     }
 }
 
-impl<'a> From<&'a str> for ElementSpec {
-    fn from(value: &'a str) -> ElementSpec {
-        ElementSpec::Literal(value.to_owned())
+impl<'a> From<&'a str> for Element {
+    fn from(value: &'a str) -> Element {
+        Element::Literal(value.to_owned())
     }
 }
 
-impl From<Statement> for ElementSpec {
-    fn from(value: Statement) -> ElementSpec {
-        ElementSpec::Push(value)
+impl From<Statement> for Element {
+    fn from(value: Statement) -> Element {
+        Element::Push(value)
     }
 }
 
-impl From<Elements> for ElementSpec {
-    fn from(value: Elements) -> ElementSpec {
-        ElementSpec::Elements(value.elements)
+impl From<Elements> for Element {
+    fn from(value: Elements) -> Element {
+        Element::Elements(value.elements)
     }
 }
 
-impl From<Vec<String>> for ElementSpec {
-    fn from(value: Vec<String>) -> ElementSpec {
-        ElementSpec::Elements(value.into_iter().map(ElementSpec::Literal).collect())
+impl From<Vec<String>> for Element {
+    fn from(value: Vec<String>) -> Element {
+        Element::Elements(value.into_iter().map(Element::Literal).collect())
     }
 }
 
-impl From<ClassSpec> for ElementSpec {
-    fn from(value: ClassSpec) -> ElementSpec {
+impl From<ClassSpec> for Element {
+    fn from(value: ClassSpec) -> Element {
         let mut elements = Elements::new();
 
         for a in &value.annotations {
@@ -131,7 +131,7 @@ impl From<ClassSpec> for ElementSpec {
             open.push(extends);
         }
 
-        ElementSpec::implements(&value.implements, &mut open);
+        Element::implements(&value.implements, &mut open);
 
         open.push(" {");
 
@@ -152,22 +152,22 @@ impl From<ClassSpec> for ElementSpec {
         }
 
         for constructor in &value.constructors {
-            class_body.push(constructor.as_element_spec(&value.name));
+            class_body.push(constructor.as_element(&value.name));
         }
 
         for element in &value.elements.elements {
             class_body.push(element);
         }
 
-        elements.push_nested(class_body.join(ElementSpec::Spacing));
+        elements.push_nested(class_body.join(Element::Spacing));
         elements.push("}");
 
         elements.into()
     }
 }
 
-impl From<MethodSpec> for ElementSpec {
-    fn from(value: MethodSpec) -> ElementSpec {
+impl From<MethodSpec> for Element {
+    fn from(value: MethodSpec) -> Element {
         let mut elements = Elements::new();
 
         for a in &value.annotations {
@@ -214,7 +214,7 @@ impl From<MethodSpec> for ElementSpec {
             open.push(" {");
 
             elements.push(open);
-            elements.push_nested(value.elements.join(ElementSpec::Spacing));
+            elements.push_nested(value.elements.join(Element::Spacing));
             elements.push("}");
         } else {
             open.push(";");
@@ -226,8 +226,8 @@ impl From<MethodSpec> for ElementSpec {
     }
 }
 
-impl From<InterfaceSpec> for ElementSpec {
-    fn from(value: InterfaceSpec) -> ElementSpec {
+impl From<InterfaceSpec> for Element {
+    fn from(value: InterfaceSpec) -> Element {
         let mut elements = Elements::new();
 
         let mut open = Statement::new();
@@ -258,15 +258,15 @@ impl From<InterfaceSpec> for ElementSpec {
         open.push(" {");
 
         elements.push(open);
-        elements.push_nested(value.elements.join(ElementSpec::Spacing));
+        elements.push_nested(value.elements.join(Element::Spacing));
         elements.push("}");
 
         elements.into()
     }
 }
 
-impl From<AnnotationSpec> for ElementSpec {
-    fn from(value: AnnotationSpec) -> ElementSpec {
+impl From<AnnotationSpec> for Element {
+    fn from(value: AnnotationSpec) -> Element {
         let mut elements = Elements::new();
 
         let mut annotation = Statement::new();
@@ -290,8 +290,8 @@ impl From<AnnotationSpec> for ElementSpec {
     }
 }
 
-impl From<EnumSpec> for ElementSpec {
-    fn from(value: EnumSpec) -> ElementSpec {
+impl From<EnumSpec> for Element {
+    fn from(value: EnumSpec) -> Element {
         let mut elements = Elements::new();
 
         for a in &value.annotations {
@@ -310,7 +310,7 @@ impl From<EnumSpec> for ElementSpec {
             open.push("enum ");
             open.push(&value.name);
 
-            ElementSpec::implements(&value.implements, &mut open);
+            Element::implements(&value.implements, &mut open);
 
             open.push(" {");
 
@@ -328,14 +328,14 @@ impl From<EnumSpec> for ElementSpec {
             let mut comma = Statement::new();
             comma.push(",");
 
-            value_joiner.push(ElementSpec::Concat(comma));
+            value_joiner.push(Element::Concat(comma));
 
             values.push(value.values.join(value_joiner));
 
             let mut endl = Statement::new();
             endl.push(";");
 
-            values.push(ElementSpec::Concat(endl));
+            values.push(Element::Concat(endl));
 
             enum_body.push(values);
         }
@@ -353,21 +353,21 @@ impl From<EnumSpec> for ElementSpec {
         }
 
         for constructor in &value.constructors {
-            enum_body.push(constructor.as_element_spec(&value.name));
+            enum_body.push(constructor.as_element(&value.name));
         }
 
         for element in &value.elements.elements {
             enum_body.push(element);
         }
 
-        elements.push_nested(enum_body.join(ElementSpec::Spacing));
+        elements.push_nested(enum_body.join(Element::Spacing));
         elements.push("}");
 
         elements.into()
     }
 }
 
-impl ToString for ElementSpec {
+impl ToString for Element {
     fn to_string(&self) -> String {
         let mut s = String::new();
         self.format(&mut ::common::ElementFormatter::new(&mut s)).unwrap();

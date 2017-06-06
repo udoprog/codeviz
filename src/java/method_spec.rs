@@ -1,7 +1,7 @@
 use super::_type::{ClassType, Type};
 use super::annotation_spec::AnnotationSpec;
 use super::argument_spec::ArgumentSpec;
-use super::element_spec::ElementSpec;
+use super::element::Element;
 use super::elements::Elements;
 use super::modifier::Modifiers;
 
@@ -54,7 +54,7 @@ impl MethodSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec>
+        where E: Into<Element>
     {
         self.elements.push(element);
     }

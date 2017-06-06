@@ -1,7 +1,7 @@
 use super::_type::ClassType;
 use super::annotation_spec::AnnotationSpec;
 use super::argument_spec::ArgumentSpec;
-use super::element_spec::ElementSpec;
+use super::element::Element;
 use super::elements::Elements;
 use super::modifier::Modifiers;
 use super::statement::Statement;
@@ -45,12 +45,12 @@ impl ConstructorSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec>
+        where E: Into<Element>
     {
         self.elements.push(element);
     }
 
-    pub fn as_element_spec(&self, enclosing: &str) -> ElementSpec {
+    pub fn as_element(&self, enclosing: &str) -> Element {
         let mut elements = Elements::new();
 
         let mut open = Statement::new();

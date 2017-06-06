@@ -1,4 +1,4 @@
-use super::element_spec::ElementSpec;
+use super::element::Element;
 use super::elements::Elements;
 use super::statement::Statement;
 
@@ -25,14 +25,14 @@ impl FunctionSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec>
+        where E: Into<Element>
     {
         self.elements.push(element);
     }
 }
 
-impl From<FunctionSpec> for ElementSpec {
-    fn from(value: FunctionSpec) -> ElementSpec {
+impl From<FunctionSpec> for Element {
+    fn from(value: FunctionSpec) -> Element {
         let mut open = Statement::new();
         open.push("function ");
         open.push(value.name);
@@ -49,7 +49,7 @@ impl From<FunctionSpec> for ElementSpec {
 
         let mut out = Elements::new();
         out.push(open);
-        out.push_nested(value.elements.join(ElementSpec::Spacing));
+        out.push_nested(value.elements.join(Element::Spacing));
         out.push("}");
 
         out.into()

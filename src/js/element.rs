@@ -3,40 +3,40 @@ use common::ElementFormat;
 use super::statement::Statement;
 
 #[derive(Debug, Clone)]
-pub enum ElementSpec {
+pub enum Element {
     Statement(Statement),
     Literal(String),
-    Elements(Vec<ElementSpec>),
-    Nested(Box<ElementSpec>),
+    Elements(Vec<Element>),
+    Nested(Box<Element>),
     Spacing,
 }
 
-impl ElementSpec {
+impl Element {
     pub fn format<E>(&self, out: &mut E) -> Result<()>
         where E: ElementFormat
     {
         match *self {
-            ElementSpec::Statement(ref statement) => {
+            Element::Statement(ref statement) => {
                 out.new_line_unless_empty()?;
                 statement.format(out)?;
             }
-            ElementSpec::Literal(ref line) => {
+            Element::Literal(ref line) => {
                 out.new_line_unless_empty()?;
                 out.write_str(line)?;
             }
-            ElementSpec::Elements(ref elements) => {
+            Element::Elements(ref elements) => {
                 for element in elements {
                     element.format(out)?;
                 }
             }
-            ElementSpec::Nested(ref element) => {
+            Element::Nested(ref element) => {
                 out.new_line_unless_empty()?;
 
                 out.indent();
                 element.format(out)?;
                 out.unindent();
             }
-            ElementSpec::Spacing => {
+            Element::Spacing => {
                 out.new_line_unless_empty()?;
                 out.new_line()?;
             }
@@ -46,33 +46,33 @@ impl ElementSpec {
     }
 }
 
-impl<'a, T> From<&'a T> for ElementSpec
-    where T: Into<ElementSpec> + Clone
+impl<'a, T> From<&'a T> for Element
+    where T: Into<Element> + Clone
 {
-    fn from(value: &'a T) -> ElementSpec {
+    fn from(value: &'a T) -> Element {
         value.clone().into()
     }
 }
 
-impl<'a> From<&'a str> for ElementSpec {
-    fn from(value: &'a str) -> ElementSpec {
-        ElementSpec::Literal(value.to_owned())
+impl<'a> From<&'a str> for Element {
+    fn from(value: &'a str) -> Element {
+        Element::Literal(value.to_owned())
     }
 }
 
-impl From<Statement> for ElementSpec {
-    fn from(value: Statement) -> ElementSpec {
-        ElementSpec::Statement(value)
+impl From<Statement> for Element {
+    fn from(value: Statement) -> Element {
+        Element::Statement(value)
     }
 }
 
-impl From<Vec<String>> for ElementSpec {
-    fn from(value: Vec<String>) -> ElementSpec {
-        ElementSpec::Elements(value.into_iter().map(ElementSpec::Literal).collect())
+impl From<Vec<String>> for Element {
+    fn from(value: Vec<String>) -> Element {
+        Element::Elements(value.into_iter().map(Element::Literal).collect())
     }
 }
 
-impl ToString for ElementSpec {
+impl ToString for Element {
     fn to_string(&self) -> String {
         let mut s = String::new();
         self.format(&mut ::common::ElementFormatter::new(&mut s)).unwrap();

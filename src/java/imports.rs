@@ -1,5 +1,5 @@
 use super::_type::{Type, ClassType};
-use super::element_spec::ElementSpec;
+use super::element::Element;
 use super::elements::Elements;
 use super::statement::Statement;
 use super::variable::Variable;
@@ -21,15 +21,15 @@ pub trait Imports {
     fn imports<I>(&self, &mut I) where I: ImportReceiver;
 }
 
-impl Imports for ElementSpec {
+impl Imports for Element {
     fn imports<I>(&self, receiver: &mut I)
         where I: ImportReceiver
     {
         match *self {
-            ElementSpec::Elements(ref elements) => receiver.import_all(elements),
-            ElementSpec::Push(ref statement) => statement.imports(receiver),
-            ElementSpec::Concat(ref statement) => statement.imports(receiver),
-            ElementSpec::Nested(ref nested) => {
+            Element::Elements(ref elements) => receiver.import_all(elements),
+            Element::Push(ref statement) => statement.imports(receiver),
+            Element::Concat(ref statement) => statement.imports(receiver),
+            Element::Nested(ref nested) => {
                 (*nested).imports(receiver);
             }
             _ => {}

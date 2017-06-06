@@ -1,4 +1,4 @@
-use common::ElementSpec;
+use common::Element;
 use super::elements::Elements;
 use super::decorator_spec::DecoratorSpec;
 use super::statement::Statement;
@@ -35,15 +35,15 @@ impl MethodSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec<Variable>>
+        where E: Into<Element<Variable>>
     {
         self.elements.push(element);
     }
 }
 
-impl From<MethodSpec> for ElementSpec<Variable> {
-    fn from(value: MethodSpec) -> ElementSpec<Variable> {
-        let mut out: Vec<ElementSpec<Variable>> = Vec::new();
+impl From<MethodSpec> for Element<Variable> {
+    fn from(value: MethodSpec) -> Element<Variable> {
+        let mut out: Vec<Element<Variable>> = Vec::new();
 
         for decorator in value.decorators {
             out.push(decorator.into());
@@ -66,11 +66,11 @@ impl From<MethodSpec> for ElementSpec<Variable> {
         out.push(decl.into());
 
         if value.elements.is_empty() {
-            out.push(ElementSpec::Nested(Box::new("pass".into())));
+            out.push(Element::Nested(Box::new("pass".into())));
         } else {
-            out.push(ElementSpec::Nested(Box::new(value.elements.into())));
+            out.push(Element::Nested(Box::new(value.elements.into())));
         }
 
-        ElementSpec::Elements(out)
+        Element::Elements(out)
     }
 }

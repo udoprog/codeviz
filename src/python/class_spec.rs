@@ -1,4 +1,4 @@
-use common::ElementSpec;
+use common::Element;
 use super::decorator_spec::DecoratorSpec;
 use super::elements::Elements;
 use super::name::Name;
@@ -30,7 +30,7 @@ impl ClassSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec<Variable>>
+        where E: Into<Element<Variable>>
     {
         self.elements.push(element);
     }
@@ -42,8 +42,8 @@ impl ClassSpec {
     }
 }
 
-impl From<ClassSpec> for ElementSpec<Variable> {
-    fn from(value: ClassSpec) -> ElementSpec<Variable> {
+impl From<ClassSpec> for Element<Variable> {
+    fn from(value: ClassSpec) -> Element<Variable> {
         let mut out = Elements::new();
 
         for decorator in value.decorators {
@@ -74,7 +74,7 @@ impl From<ClassSpec> for ElementSpec<Variable> {
         if value.elements.is_empty() {
             out.push_nested("pass");
         } else {
-            out.push_nested(value.elements.join(ElementSpec::Spacing));
+            out.push_nested(value.elements.join(Element::Spacing));
         }
 
         out.into()

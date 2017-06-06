@@ -1,6 +1,6 @@
 use errors::*;
 use common::ElementFormat;
-use super::element_spec::ElementSpec;
+use super::element::Element;
 use super::variable_format::VariableFormat;
 
 /// A single statement, made up by variables.
@@ -65,10 +65,10 @@ impl<'a, T, Var> From<&'a T> for Statement<Var>
     }
 }
 
-impl<Var> From<Statement<Var>> for ElementSpec<Var>
+impl<Var> From<Statement<Var>> for Element<Var>
     where Var: VariableFormat
 {
-    fn from(value: Statement<Var>) -> ElementSpec<Var> {
-        ElementSpec::Statement(value)
+    fn from(value: Statement<Var>) -> Element<Var> {
+        Element::Statement(value)
     }
 }

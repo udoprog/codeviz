@@ -5,44 +5,44 @@ use super::statement::Statement;
 use super::variable_format::VariableFormat;
 
 #[derive(Debug, Clone)]
-pub enum ElementSpec<Var>
+pub enum Element<Var>
     where Var: VariableFormat
 {
     Statement(Statement<Var>),
     Literal(String),
-    Elements(Vec<ElementSpec<Var>>),
-    Nested(Box<ElementSpec<Var>>),
+    Elements(Vec<Element<Var>>),
+    Nested(Box<Element<Var>>),
     Spacing,
 }
 
-impl<Var> ElementSpec<Var>
+impl<Var> Element<Var>
     where Var: VariableFormat
 {
     pub fn format<E>(&self, out: &mut E) -> Result<()>
         where E: ElementFormat
     {
         match *self {
-            ElementSpec::Statement(ref statement) => {
+            Element::Statement(ref statement) => {
                 out.new_line_unless_empty()?;
                 statement.format(out)?;
             }
-            ElementSpec::Literal(ref line) => {
+            Element::Literal(ref line) => {
                 out.new_line_unless_empty()?;
                 out.write_str(line)?;
             }
-            ElementSpec::Elements(ref elements) => {
+            Element::Elements(ref elements) => {
                 for element in elements {
                     element.format(out)?;
                 }
             }
-            ElementSpec::Nested(ref element) => {
+            Element::Nested(ref element) => {
                 out.new_line_unless_empty()?;
 
                 out.indent();
                 element.format(out)?;
                 out.unindent();
             }
-            ElementSpec::Spacing => {
+            Element::Spacing => {
                 out.new_line_unless_empty()?;
                 out.new_line()?;
             }
@@ -52,40 +52,40 @@ impl<Var> ElementSpec<Var>
     }
 }
 
-impl<'a, T, Var> From<&'a T> for ElementSpec<Var>
-    where T: Into<ElementSpec<Var>> + Clone,
+impl<'a, T, Var> From<&'a T> for Element<Var>
+    where T: Into<Element<Var>> + Clone,
           Var: VariableFormat
 {
-    fn from(value: &'a T) -> ElementSpec<Var> {
+    fn from(value: &'a T) -> Element<Var> {
         value.clone().into()
     }
 }
 
-impl<'a, Var> From<&'a str> for ElementSpec<Var>
+impl<'a, Var> From<&'a str> for Element<Var>
     where Var: VariableFormat
 {
-    fn from(value: &'a str) -> ElementSpec<Var> {
-        ElementSpec::Literal(value.to_owned())
+    fn from(value: &'a str) -> Element<Var> {
+        Element::Literal(value.to_owned())
     }
 }
 
-impl<Var> From<Elements<Var>> for ElementSpec<Var>
+impl<Var> From<Elements<Var>> for Element<Var>
     where Var: VariableFormat
 {
-    fn from(value: Elements<Var>) -> ElementSpec<Var> {
-        ElementSpec::Elements(value.elements)
+    fn from(value: Elements<Var>) -> Element<Var> {
+        Element::Elements(value.elements)
     }
 }
 
-impl<Var> From<Vec<String>> for ElementSpec<Var>
+impl<Var> From<Vec<String>> for Element<Var>
     where Var: VariableFormat
 {
-    fn from(value: Vec<String>) -> ElementSpec<Var> {
-        ElementSpec::Elements(value.into_iter().map(ElementSpec::Literal).collect())
+    fn from(value: Vec<String>) -> Element<Var> {
+        Element::Elements(value.into_iter().map(Element::Literal).collect())
     }
 }
 
-impl<Var> ToString for ElementSpec<Var>
+impl<Var> ToString for Element<Var>
     where Var: VariableFormat
 {
     fn to_string(&self) -> String {

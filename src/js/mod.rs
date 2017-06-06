@@ -1,6 +1,6 @@
 mod class_spec;
 mod constructor_spec;
-mod element_spec;
+mod element;
 mod elements;
 mod file_spec;
 mod function_spec;
@@ -12,7 +12,7 @@ mod variable;
 
 pub use self::class_spec::*;
 pub use self::constructor_spec::*;
-pub use self::element_spec::*;
+pub use self::element::*;
 pub use self::elements::*;
 pub use self::file_spec::*;
 pub use self::function_spec::*;

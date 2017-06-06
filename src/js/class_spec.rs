@@ -1,4 +1,4 @@
-use super::element_spec::ElementSpec;
+use super::element::Element;
 use super::elements::Elements;
 use super::statement::Statement;
 
@@ -19,20 +19,20 @@ impl ClassSpec {
     }
 
     pub fn push_constructor<E>(&mut self, element: E)
-        where E: Into<ElementSpec>
+        where E: Into<Element>
     {
         self.constructors.push(element);
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec>
+        where E: Into<Element>
     {
         self.elements.push(element);
     }
 }
 
-impl From<ClassSpec> for ElementSpec {
-    fn from(value: ClassSpec) -> ElementSpec {
+impl From<ClassSpec> for Element {
+    fn from(value: ClassSpec) -> Element {
         let mut open = Statement::new();
 
         open.push("class ");
@@ -42,16 +42,16 @@ impl From<ClassSpec> for ElementSpec {
         let mut body = Elements::new();
 
         if !value.constructors.is_empty() {
-            body.push(value.constructors.join(ElementSpec::Spacing));
+            body.push(value.constructors.join(Element::Spacing));
         }
 
         if !value.elements.is_empty() {
-            body.push(value.elements.join(ElementSpec::Spacing));
+            body.push(value.elements.join(Element::Spacing));
         }
 
         let mut out = Elements::new();
         out.push(open);
-        out.push_nested(body.join(ElementSpec::Spacing));
+        out.push_nested(body.join(Element::Spacing));
         out.push("}");
 
         out.into()

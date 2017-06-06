@@ -1,4 +1,4 @@
-use super::element_spec::ElementSpec;
+use super::element::Element;
 use super::elements::Elements;
 use super::statement::Statement;
 
@@ -23,14 +23,14 @@ impl ConstructorSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec>
+        where E: Into<Element>
     {
         self.elements.push(element);
     }
 }
 
-impl From<ConstructorSpec> for ElementSpec {
-    fn from(value: ConstructorSpec) -> ElementSpec {
+impl From<ConstructorSpec> for Element {
+    fn from(value: ConstructorSpec) -> Element {
         let mut open = Statement::new();
 
         let mut arguments = Statement::new();
@@ -48,7 +48,7 @@ impl From<ConstructorSpec> for ElementSpec {
         let mut out = Elements::new();
 
         out.push(open);
-        out.push_nested(value.elements.join(ElementSpec::Spacing));
+        out.push_nested(value.elements.join(Element::Spacing));
         out.push("}");
 
         out.into()

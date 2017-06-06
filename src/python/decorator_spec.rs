@@ -1,4 +1,4 @@
-use common::ElementSpec;
+use common::Element;
 use super::name::{Name, BuiltInName, ImportedName};
 use super::statement::Statement;
 use super::variable::Variable;
@@ -46,8 +46,8 @@ impl From<ImportedName> for DecoratorSpec {
     }
 }
 
-impl From<DecoratorSpec> for ElementSpec<Variable> {
-    fn from(value: DecoratorSpec) -> ElementSpec<Variable> {
+impl From<DecoratorSpec> for Element<Variable> {
+    fn from(value: DecoratorSpec) -> Element<Variable> {
         let mut decl = Statement::new();
 
         decl.push("@");

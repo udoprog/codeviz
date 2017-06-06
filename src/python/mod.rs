@@ -8,7 +8,7 @@ mod variable;
 mod statement;
 mod elements;
 
-pub use common::ElementSpec;
+pub use common::Element;
 pub use self::class_spec::*;
 pub use self::decorator_spec::*;
 pub use self::elements::*;

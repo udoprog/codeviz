@@ -1,7 +1,7 @@
 use errors::*;
 use common::ElementFormatter;
 use super::_type::ClassType;
-use super::element_spec::ElementSpec;
+use super::element::Element;
 use super::elements::Elements;
 use super::imports::{Imports, ImportReceiver};
 use super::statement::Statement;
@@ -23,7 +23,7 @@ impl FileSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec>
+        where E: Into<Element>
     {
         self.elements.push(element);
     }
@@ -68,10 +68,10 @@ impl FileSpec {
             file.push(imported);
         }
 
-        let content: ElementSpec = self.elements.clone().join(ElementSpec::Spacing).into();
+        let content: Element = self.elements.clone().join(Element::Spacing).into();
         file.push(content);
 
-        let file: ElementSpec = file.join(ElementSpec::Spacing).into();
+        let file: Element = file.join(Element::Spacing).into();
 
         file.format(&mut ElementFormatter::new(out))?;
         out.write_char('\n')?;

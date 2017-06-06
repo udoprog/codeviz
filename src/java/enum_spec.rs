@@ -1,7 +1,7 @@
 use super::_type::ClassType;
 use super::annotation_spec::AnnotationSpec;
 use super::constructor_spec::ConstructorSpec;
-use super::element_spec::ElementSpec;
+use super::element::Element;
 use super::elements::Elements;
 use super::field_spec::FieldSpec;
 use super::modifier::Modifiers;
@@ -33,7 +33,7 @@ impl EnumSpec {
     }
 
     pub fn push_value<E>(&mut self, value: E)
-        where E: Into<ElementSpec>
+        where E: Into<Element>
     {
         self.values.push(value);
     }

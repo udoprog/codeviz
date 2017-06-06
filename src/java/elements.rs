@@ -1,8 +1,8 @@
-use super::element_spec::ElementSpec;
+use super::element::Element;
 
 #[derive(Debug, Clone)]
 pub struct Elements {
-    pub elements: Vec<ElementSpec>,
+    pub elements: Vec<Element>,
 }
 
 impl Elements {
@@ -11,15 +11,15 @@ impl Elements {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec>
+        where E: Into<Element>
     {
         self.elements.push(element.into());
     }
 
     pub fn push_nested<E>(&mut self, element: E)
-        where E: Into<ElementSpec>
+        where E: Into<Element>
     {
-        self.elements.push(ElementSpec::Nested(Box::new(element.into())));
+        self.elements.push(Element::Nested(Box::new(element.into())));
     }
 
     pub fn is_empty(&self) -> bool {
@@ -27,7 +27,7 @@ impl Elements {
     }
 
     pub fn join<S>(self, separator: S) -> Elements
-        where S: Into<ElementSpec> + Clone
+        where S: Into<Element> + Clone
     {
         let mut it = self.elements.into_iter();
 
