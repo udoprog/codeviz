@@ -18,7 +18,7 @@ pub enum Variable {
 }
 
 impl VariableFormat for Variable {
-    fn format<E>(&self, out: &mut E) -> Result<()>
+    fn format<E>(&self, out: &mut E, depth: usize) -> Result<()>
         where E: ElementFormat
     {
         match *self {
@@ -26,7 +26,7 @@ impl VariableFormat for Variable {
                 quote_string(out, string)?;
             }
             Variable::Statement(ref stmt) => {
-                stmt.format(out)?;
+                stmt.format(out, depth)?;
             }
             Variable::Literal(ref content) => {
                 out.write_str(content)?;

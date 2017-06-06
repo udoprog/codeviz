@@ -24,7 +24,7 @@ impl<Var> Element<Var>
         match *self {
             Element::Statement(ref statement) => {
                 out.new_line_unless_empty()?;
-                statement.format(out)?;
+                statement.format(out, 0usize)?;
             }
             Element::Literal(ref line) => {
                 out.new_line_unless_empty()?;
