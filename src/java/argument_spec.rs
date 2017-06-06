@@ -48,7 +48,7 @@ impl From<ArgumentSpec> for Statement {
         let mut s = Statement::new();
 
         for a in &value.annotations {
-            s.push(a);
+            s.push(Variable::Statement(a.into()));
             s.push(" ");
         }
 

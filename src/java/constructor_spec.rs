@@ -2,10 +2,11 @@ use super::_type::ClassType;
 use super::annotation_spec::AnnotationSpec;
 use super::argument_spec::ArgumentSpec;
 use super::common::join_statements;
-use super::element::Element;
+use super::element::*;
 use super::elements::Elements;
 use super::modifier::Modifiers;
 use super::statement::Statement;
+use super::variable::Variable;
 
 #[derive(Debug, Clone)]
 pub struct ConstructorSpec {
@@ -66,9 +67,14 @@ impl ConstructorSpec {
         }
 
         open.push(enclosing);
-        open.push("(");
-        open.push(join_statements(self.arguments, ", "));
-        open.push(")");
+
+        if self.arguments.is_empty() {
+            open.push("()");
+        } else {
+            open.push("(");
+            open.push(Nested(Box::new(Push(join_statements(self.arguments, ", ")))));
+            open.push(Variable::Element(Push(Variable::Literal(String::from(")")).into())));
+        }
 
         if !self.throws.is_empty() {
             open.push(" throws ");

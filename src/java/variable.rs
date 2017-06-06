@@ -2,6 +2,7 @@ use common::ElementFormat;
 use common::VariableFormat;
 use errors::*;
 use super::_type::Type;
+use super::element::Element;
 use super::statement::Statement;
 
 #[derive(Debug, Clone)]
@@ -10,18 +11,20 @@ pub enum Variable {
     Type(Type),
     String(String),
     Statement(Statement),
+    Element(Element),
     Spacing,
 }
 
 impl VariableFormat for Variable {
-    fn format<E>(&self, out: &mut E, level: usize) -> Result<()>
+    fn format<E>(&self, out: &mut E, depth: usize) -> Result<()>
         where E: ElementFormat
     {
         match *self {
-            Variable::Type(ref ty) => ty.format(out, level)?,
+            Variable::Type(ref ty) => ty.format(out, depth)?,
             Variable::String(ref string) => java_quote_string(out, string)?,
-            Variable::Statement(ref stmt) => stmt.format(out, level)?,
+            Variable::Statement(ref stmt) => stmt.format(out, depth)?,
             Variable::Literal(ref content) => out.write_str(content)?,
+            Variable::Element(ref element) => element.format(out)?,
             Variable::Spacing => out.new_line()?,
         };
 
@@ -52,6 +55,12 @@ impl From<String> for Variable {
 impl From<Statement> for Variable {
     fn from(value: Statement) -> Variable {
         Variable::Statement(value)
+    }
+}
+
+impl From<Element> for Variable {
+    fn from(value: Element) -> Variable {
+        Variable::Element(value)
     }
 }
 

@@ -68,16 +68,8 @@ impl From<AnnotationSpec> for Element {
     }
 }
 
-impl From<AnnotationSpec> for Variable {
-    fn from(value: AnnotationSpec) -> Variable {
-        Variable::Statement(value.into())
-    }
-}
-
 impl From<AnnotationSpec> for Statement {
     fn from(value: AnnotationSpec) -> Statement {
-        let mut s = Statement::new();
-        s.push(value);
-        s
+        Statement { parts: vec![Variable::Element(value.into())] }
     }
 }
