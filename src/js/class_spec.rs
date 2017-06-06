@@ -1,4 +1,4 @@
-use super::element::Element;
+use super::element::*;
 use super::elements::Elements;
 use super::statement::Statement;
 
@@ -42,16 +42,16 @@ impl From<ClassSpec> for Element {
         let mut body = Elements::new();
 
         if !value.constructors.is_empty() {
-            body.push(value.constructors.join(Element::Spacing));
+            body.push(value.constructors.join(Spacing));
         }
 
         if !value.elements.is_empty() {
-            body.push(value.elements.join(Element::Spacing));
+            body.push(value.elements.join(Spacing));
         }
 
         let mut out = Elements::new();
         out.push(open);
-        out.push_nested(body.join(Element::Spacing));
+        out.push_nested(body.join(Spacing));
         out.push("}");
 
         out.into()

@@ -1,5 +1,5 @@
 use super::function_spec::FunctionSpec;
-use super::element::Element;
+use super::element::*;
 use super::elements::Elements;
 use super::name::{Name, ImportedName};
 use super::statement::Statement;
@@ -62,13 +62,13 @@ impl Imports for Element {
         where I: ImportReceiver
     {
         match *self {
-            Element::Statement(ref statement) => {
+            Statement(ref statement) => {
                 statement.imports(receiver);
             }
-            Element::Elements(ref elements) => {
+            Elements(ref elements) => {
                 receiver.import_all(elements);
             }
-            Element::Nested(ref element) => {
+            Nested(ref element) => {
                 element.imports(receiver);
             }
             _ => {}

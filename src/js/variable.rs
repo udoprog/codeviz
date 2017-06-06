@@ -1,5 +1,8 @@
-use super::statement::Statement;
+use errors::*;
+use common::VariableFormat;
+use common::ElementFormat;
 use super::name::{Name, ImportedName, BuiltInName, LocalName};
+use super::statement::Statement;
 
 /// Variables that are part of statements.
 #[derive(Debug, Clone)]
@@ -12,6 +15,29 @@ pub enum Variable {
     Statement(Statement),
     /// A name that will be appended.
     Name(Name),
+}
+
+impl VariableFormat for Variable {
+    fn format<E>(&self, out: &mut E) -> Result<()>
+        where E: ElementFormat
+    {
+        match *self {
+            Variable::String(ref string) => {
+                quote_string(out, string)?;
+            }
+            Variable::Statement(ref stmt) => {
+                stmt.format(out)?;
+            }
+            Variable::Literal(ref content) => {
+                out.write_str(content)?;
+            }
+            Variable::Name(ref name) => {
+                name.format(out)?;
+            }
+        }
+
+        Ok(())
+    }
 }
 
 impl<'a, A> From<&'a A> for Variable
@@ -62,4 +88,29 @@ impl From<LocalName> for Variable {
     fn from(value: LocalName) -> Variable {
         Variable::Name(value.into())
     }
+}
+
+/// Quote a string to make it suitable as a literal JavaScript string.
+pub fn quote_string<E>(out: &mut E, input: &str) -> Result<()>
+    where E: ElementFormat
+{
+    out.write_char('"')?;
+
+    for c in input.chars() {
+        match c {
+            '\t' => out.write_str("\\t"),
+            '\u{0007}' => out.write_str("\\b"),
+            '\n' => out.write_str("\\n"),
+            '\r' => out.write_str("\\r"),
+            '\u{0014}' => out.write_str("\\f"),
+            '\'' => out.write_str("\\'"),
+            '"' => out.write_str("\\\""),
+            '\\' => out.write_str("\\\\"),
+            c => out.write_char(c),
+        }?;
+    }
+
+    out.write_char('"')?;
+
+    Ok(())
 }

@@ -1,4 +1,4 @@
-use super::element::Element;
+use super::element::*;
 use super::elements::Elements;
 use super::statement::Statement;
 
@@ -49,7 +49,7 @@ impl From<FunctionSpec> for Element {
 
         let mut out = Elements::new();
         out.push(open);
-        out.push_nested(value.elements.join(Element::Spacing));
+        out.push_nested(value.elements.join(Spacing));
         out.push("}");
 
         out.into()
