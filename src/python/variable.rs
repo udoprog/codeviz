@@ -1,7 +1,8 @@
 use errors::*;
 use common::ElementFormat;
 use super::name::Name;
-use super::statement::Statement;
+use common::Statement;
+use common::VariableFormat;
 
 /// Variables that are part of statements.
 #[derive(Debug, Clone)]
@@ -11,13 +12,13 @@ pub enum Variable {
     /// String that will be quoted and appended.
     String(String),
     /// Another statement that will be appended.
-    Statement(Statement),
+    Statement(Statement<Variable>),
     /// A name that will be appended.
     Name(Name),
 }
 
-impl Variable {
-    pub fn format<E>(&self, out: &mut E) -> Result<()>
+impl VariableFormat for Variable {
+    fn format<E>(&self, out: &mut E) -> Result<()>
         where E: ElementFormat
     {
         match *self {
@@ -59,14 +60,14 @@ impl From<String> for Variable {
     }
 }
 
-impl From<Statement> for Variable {
-    fn from(value: Statement) -> Variable {
+impl From<Statement<Variable>> for Variable {
+    fn from(value: Statement<Variable>) -> Variable {
         Variable::Statement(value)
     }
 }
 
-impl From<Variable> for Statement {
-    fn from(value: Variable) -> Statement {
+impl From<Variable> for Statement<Variable> {
+    fn from(value: Variable) -> Statement<Variable> {
         Statement { parts: vec![value] }
     }
 }

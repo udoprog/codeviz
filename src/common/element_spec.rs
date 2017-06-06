@@ -2,17 +2,22 @@ use common::ElementFormat;
 use errors::*;
 use super::elements::Elements;
 use super::statement::Statement;
+use super::variable_format::VariableFormat;
 
 #[derive(Debug, Clone)]
-pub enum ElementSpec {
-    Statement(Statement),
+pub enum ElementSpec<Var>
+    where Var: VariableFormat
+{
+    Statement(Statement<Var>),
     Literal(String),
-    Elements(Vec<ElementSpec>),
-    Nested(Box<ElementSpec>),
+    Elements(Vec<ElementSpec<Var>>),
+    Nested(Box<ElementSpec<Var>>),
     Spacing,
 }
 
-impl ElementSpec {
+impl<Var> ElementSpec<Var>
+    where Var: VariableFormat
+{
     pub fn format<E>(&self, out: &mut E) -> Result<()>
         where E: ElementFormat
     {
@@ -47,33 +52,42 @@ impl ElementSpec {
     }
 }
 
-impl<'a, T> From<&'a T> for ElementSpec
-    where T: Into<ElementSpec> + Clone
+impl<'a, T, Var> From<&'a T> for ElementSpec<Var>
+    where T: Into<ElementSpec<Var>> + Clone,
+          Var: VariableFormat
 {
-    fn from(value: &'a T) -> ElementSpec {
+    fn from(value: &'a T) -> ElementSpec<Var> {
         value.clone().into()
     }
 }
 
-impl<'a> From<&'a str> for ElementSpec {
-    fn from(value: &'a str) -> ElementSpec {
+impl<'a, Var> From<&'a str> for ElementSpec<Var>
+    where Var: VariableFormat
+{
+    fn from(value: &'a str) -> ElementSpec<Var> {
         ElementSpec::Literal(value.to_owned())
     }
 }
 
-impl From<Elements> for ElementSpec {
-    fn from(value: Elements) -> ElementSpec {
+impl<Var> From<Elements<Var>> for ElementSpec<Var>
+    where Var: VariableFormat
+{
+    fn from(value: Elements<Var>) -> ElementSpec<Var> {
         ElementSpec::Elements(value.elements)
     }
 }
 
-impl From<Vec<String>> for ElementSpec {
-    fn from(value: Vec<String>) -> ElementSpec {
+impl<Var> From<Vec<String>> for ElementSpec<Var>
+    where Var: VariableFormat
+{
+    fn from(value: Vec<String>) -> ElementSpec<Var> {
         ElementSpec::Elements(value.into_iter().map(ElementSpec::Literal).collect())
     }
 }
 
-impl ToString for ElementSpec {
+impl<Var> ToString for ElementSpec<Var>
+    where Var: VariableFormat
+{
     fn to_string(&self) -> String {
         let mut s = String::new();
         self.format(&mut ::common::ElementFormatter::new(&mut s)).unwrap();

@@ -1,8 +1,9 @@
+use common::ElementSpec;
 use super::decorator_spec::DecoratorSpec;
-use super::element_spec::ElementSpec;
 use super::elements::Elements;
 use super::name::Name;
 use super::statement::Statement;
+use super::variable::Variable;
 
 #[derive(Debug, Clone)]
 pub struct ClassSpec {
@@ -29,7 +30,7 @@ impl ClassSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec>
+        where E: Into<ElementSpec<Variable>>
     {
         self.elements.push(element);
     }
@@ -41,8 +42,8 @@ impl ClassSpec {
     }
 }
 
-impl From<ClassSpec> for ElementSpec {
-    fn from(value: ClassSpec) -> ElementSpec {
+impl From<ClassSpec> for ElementSpec<Variable> {
+    fn from(value: ClassSpec) -> ElementSpec<Variable> {
         let mut out = Elements::new();
 
         for decorator in value.decorators {

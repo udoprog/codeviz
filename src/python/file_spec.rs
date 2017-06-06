@@ -1,11 +1,12 @@
 use common::ElementFormatter;
+use common::ElementSpec;
 use errors::*;
 use std::collections::BTreeSet;
-use super::element_spec::ElementSpec;
 use super::elements::Elements;
 use super::imports::{Imports, ImportReceiver};
 use super::name::ImportedName;
 use super::statement::Statement;
+use super::variable::Variable;
 
 #[derive(Debug, Clone)]
 pub struct FileSpec {
@@ -18,7 +19,7 @@ impl FileSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<ElementSpec>
+        where E: Into<ElementSpec<Variable>>
     {
         self.elements.push(element);
     }
@@ -65,7 +66,7 @@ impl FileSpec {
 
         elements.push(self.elements.clone().join(ElementSpec::Spacing));
 
-        let elements: ElementSpec = elements.clone().join(ElementSpec::Spacing).into();
+        let elements: ElementSpec<Variable> = elements.clone().join(ElementSpec::Spacing).into();
 
         elements.format(&mut ElementFormatter::new(out))?;
         out.write_char('\n')?;
