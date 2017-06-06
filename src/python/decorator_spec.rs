@@ -1,5 +1,6 @@
 use super::name::{Name, BuiltInName, ImportedName};
 use super::statement::Statement;
+use super::element_spec::ElementSpec;
 
 #[derive(Debug, Clone)]
 pub struct DecoratorSpec {
@@ -41,5 +42,16 @@ impl From<BuiltInName> for DecoratorSpec {
 impl From<ImportedName> for DecoratorSpec {
     fn from(value: ImportedName) -> DecoratorSpec {
         DecoratorSpec::new(value)
+    }
+}
+
+impl From<DecoratorSpec> for ElementSpec {
+    fn from(value: DecoratorSpec) -> ElementSpec {
+        let mut decl = Statement::new();
+
+        decl.push("@");
+        decl.push(value.name);
+
+        decl.into()
     }
 }

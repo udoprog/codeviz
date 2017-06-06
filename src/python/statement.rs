@@ -1,31 +1,7 @@
 use errors::*;
 use common::ElementFormat;
 use super::variable::Variable;
-
-/// Quote a string to make it suitable as a literal Python string.
-fn quote_string<E>(out: &mut E, input: &str) -> Result<()>
-    where E: ElementFormat
-{
-    out.write_char('"')?;
-
-    for c in input.chars() {
-        match c {
-            '\t' => out.write_str("\\t"),
-            '\u{0007}' => out.write_str("\\b"),
-            '\n' => out.write_str("\\n"),
-            '\r' => out.write_str("\\r"),
-            '\u{0014}' => out.write_str("\\f"),
-            '\'' => out.write_str("\\'"),
-            '"' => out.write_str("\\\""),
-            '\\' => out.write_str("\\\\"),
-            c => out.write_char(c),
-        }?;
-    }
-
-    out.write_char('"')?;
-
-    Ok(())
-}
+use super::element_spec::ElementSpec;
 
 /// A single statement, made up by variables.
 #[derive(Debug, Clone)]
@@ -71,20 +47,7 @@ impl Statement {
         where E: ElementFormat
     {
         for part in &self.parts {
-            match *part {
-                Variable::String(ref string) => {
-                    quote_string(out, string)?;
-                }
-                Variable::Statement(ref stmt) => {
-                    stmt.format(out)?;
-                }
-                Variable::Literal(ref content) => {
-                    out.write_str(content)?;
-                }
-                Variable::Name(ref name) => {
-                    name.format(out)?;
-                }
-            }
+            part.format(out)?;
         }
 
         Ok(())
@@ -99,14 +62,14 @@ impl<'a, T> From<&'a T> for Statement
     }
 }
 
-impl From<Variable> for Statement {
-    fn from(value: Variable) -> Statement {
-        Statement { parts: vec![value] }
-    }
-}
-
 impl From<String> for Statement {
     fn from(value: String) -> Statement {
         Statement { parts: vec![Variable::Literal(value)] }
+    }
+}
+
+impl From<Statement> for ElementSpec {
+    fn from(value: Statement) -> ElementSpec {
+        ElementSpec::Statement(value)
     }
 }

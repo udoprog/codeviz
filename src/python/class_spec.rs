@@ -2,6 +2,7 @@ use super::decorator_spec::DecoratorSpec;
 use super::element_spec::ElementSpec;
 use super::elements::Elements;
 use super::name::Name;
+use super::statement::Statement;
 
 #[derive(Debug, Clone)]
 pub struct ClassSpec {
@@ -37,5 +38,44 @@ impl ClassSpec {
         where N: Into<Name>
     {
         self.extends.push(name.into());
+    }
+}
+
+impl From<ClassSpec> for ElementSpec {
+    fn from(value: ClassSpec) -> ElementSpec {
+        let mut out = Elements::new();
+
+        for decorator in value.decorators {
+            out.push(decorator);
+        }
+
+        let mut decl = Statement::new();
+        decl.push("class ");
+        decl.push(value.name);
+
+        if !value.extends.is_empty() {
+            decl.push("(");
+
+            let mut extends = Statement::new();
+
+            for extend in value.extends {
+                extends.push(extend);
+            }
+
+            decl.push(extends.join(", "));
+            decl.push(")");
+        }
+
+        decl.push(":");
+
+        out.push(decl);
+
+        if value.elements.is_empty() {
+            out.push_nested("pass");
+        } else {
+            out.push_nested(value.elements.join(ElementSpec::Spacing));
+        }
+
+        out.into()
     }
 }

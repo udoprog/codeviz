@@ -1,9 +1,6 @@
 use common::ElementFormat;
 use errors::*;
-use super::class_spec::ClassSpec;
-use super::decorator_spec::DecoratorSpec;
 use super::elements::Elements;
-use super::method_spec::MethodSpec;
 use super::statement::Statement;
 
 #[derive(Debug, Clone)]
@@ -61,96 +58,6 @@ impl<'a, T> From<&'a T> for ElementSpec
 impl<'a> From<&'a str> for ElementSpec {
     fn from(value: &'a str) -> ElementSpec {
         ElementSpec::Literal(value.to_owned())
-    }
-}
-
-impl From<MethodSpec> for ElementSpec {
-    fn from(value: MethodSpec) -> ElementSpec {
-        let mut out: Vec<ElementSpec> = Vec::new();
-
-        for decorator in value.decorators {
-            out.push(decorator.into());
-        }
-
-        let mut decl = Statement::new();
-        decl.push("def ");
-        decl.push(value.name);
-        decl.push("(");
-
-        let mut arguments = Statement::new();
-
-        for argument in value.arguments {
-            arguments.push(argument);
-        }
-
-        decl.push(arguments.join(", "));
-        decl.push("):");
-
-        out.push(decl.into());
-
-        if value.elements.is_empty() {
-            out.push(ElementSpec::Nested(Box::new("pass".into())));
-        } else {
-            out.push(ElementSpec::Nested(Box::new(value.elements.into())));
-        }
-
-        ElementSpec::Elements(out)
-    }
-}
-
-impl From<ClassSpec> for ElementSpec {
-    fn from(value: ClassSpec) -> ElementSpec {
-        let mut out = Elements::new();
-
-        for decorator in value.decorators {
-            out.push(decorator);
-        }
-
-        let mut decl = Statement::new();
-        decl.push("class ");
-        decl.push(value.name);
-
-        if !value.extends.is_empty() {
-            decl.push("(");
-
-            let mut extends = Statement::new();
-
-            for extend in value.extends {
-                extends.push(extend);
-            }
-
-            decl.push(extends.join(", "));
-            decl.push(")");
-        }
-
-        decl.push(":");
-
-        out.push(decl);
-
-        if value.elements.is_empty() {
-            out.push_nested("pass");
-        } else {
-            out.push_nested(value.elements.join(ElementSpec::Spacing));
-        }
-
-        out.into()
-    }
-}
-
-impl From<DecoratorSpec> for ElementSpec {
-    fn from(value: DecoratorSpec) -> ElementSpec {
-        let mut decl = Statement::new();
-
-        decl.push("@");
-        decl.push(value.name);
-
-        decl.into()
-    }
-}
-
-impl From<Statement> for ElementSpec {
-    fn from(value: Statement) -> ElementSpec {
-        ElementSpec::Statement(value)
     }
 }
 

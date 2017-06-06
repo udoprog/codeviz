@@ -39,3 +39,37 @@ impl MethodSpec {
         self.elements.push(element);
     }
 }
+
+impl From<MethodSpec> for ElementSpec {
+    fn from(value: MethodSpec) -> ElementSpec {
+        let mut out: Vec<ElementSpec> = Vec::new();
+
+        for decorator in value.decorators {
+            out.push(decorator.into());
+        }
+
+        let mut decl = Statement::new();
+        decl.push("def ");
+        decl.push(value.name);
+        decl.push("(");
+
+        let mut arguments = Statement::new();
+
+        for argument in value.arguments {
+            arguments.push(argument);
+        }
+
+        decl.push(arguments.join(", "));
+        decl.push("):");
+
+        out.push(decl.into());
+
+        if value.elements.is_empty() {
+            out.push(ElementSpec::Nested(Box::new("pass".into())));
+        } else {
+            out.push(ElementSpec::Nested(Box::new(value.elements.into())));
+        }
+
+        ElementSpec::Elements(out)
+    }
+}

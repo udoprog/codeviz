@@ -1,5 +1,6 @@
 use errors::*;
 use common::ElementFormat;
+use super::variable::Variable;
 
 #[derive(Debug, Clone)]
 pub enum Name {
@@ -92,5 +93,29 @@ impl From<BuiltInName> for Name {
 impl From<LocalName> for Name {
     fn from(value: LocalName) -> Name {
         Name::Local(value)
+    }
+}
+
+impl From<Name> for Variable {
+    fn from(value: Name) -> Variable {
+        Variable::Name(value)
+    }
+}
+
+impl From<ImportedName> for Variable {
+    fn from(value: ImportedName) -> Variable {
+        Variable::Name(value.into())
+    }
+}
+
+impl From<BuiltInName> for Variable {
+    fn from(value: BuiltInName) -> Variable {
+        Variable::Name(value.into())
+    }
+}
+
+impl From<LocalName> for Variable {
+    fn from(value: LocalName) -> Variable {
+        Variable::Name(value.into())
     }
 }
