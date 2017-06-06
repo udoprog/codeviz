@@ -11,8 +11,6 @@ impl From<String> for Statement {
 
 impl From<Variable> for Statement {
     fn from(value: Variable) -> Statement {
-        let mut s = Statement::new();
-        s.push(value);
-        s
+        Statement { parts: vec![value] }
     }
 }

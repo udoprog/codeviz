@@ -26,7 +26,7 @@ impl Imports for Element {
         where I: ImportReceiver
     {
         match *self {
-            Elements(ref elements) => receiver.import_all(elements),
+            Inner(ref elements) => receiver.import_all(elements),
             Push(ref statement) => statement.imports(receiver),
             Concat(ref statement) => statement.imports(receiver),
             Nested(ref nested) => {

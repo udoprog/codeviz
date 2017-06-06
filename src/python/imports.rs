@@ -65,7 +65,7 @@ impl Imports for Element {
             Push(ref statement) => {
                 statement.imports(receiver);
             }
-            Elements(ref elements) => {
+            Inner(ref elements) => {
                 receiver.import_all(elements);
             }
             Nested(ref element) => {

@@ -11,7 +11,7 @@ pub enum Element<Var>
     Push(Statement<Var>),
     Concat(Statement<Var>),
     Literal(String),
-    Elements(Vec<Element<Var>>),
+    Inner(Vec<Element<Var>>),
     Nested(Box<Element<Var>>),
     Spacing,
 }
@@ -34,7 +34,7 @@ impl<Var> Element<Var>
                 out.new_line_unless_empty()?;
                 out.write_str(line)?;
             }
-            Element::Elements(ref elements) => {
+            Element::Inner(ref elements) => {
                 for element in elements {
                     element.format(out)?;
                 }
@@ -77,7 +77,7 @@ impl<Var> From<Elements<Var>> for Element<Var>
     where Var: VariableFormat
 {
     fn from(value: Elements<Var>) -> Element<Var> {
-        Element::Elements(value.elements)
+        Element::Inner(value.elements)
     }
 }
 
@@ -85,7 +85,7 @@ impl<Var> From<Vec<String>> for Element<Var>
     where Var: VariableFormat
 {
     fn from(value: Vec<String>) -> Element<Var> {
-        Element::Elements(value.into_iter().map(Element::Literal).collect())
+        Element::Inner(value.into_iter().map(Element::Literal).collect())
     }
 }
 

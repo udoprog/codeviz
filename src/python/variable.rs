@@ -66,12 +66,6 @@ impl From<Statement<Variable>> for Variable {
     }
 }
 
-impl From<Variable> for Statement<Variable> {
-    fn from(value: Variable) -> Statement<Variable> {
-        Statement { parts: vec![value] }
-    }
-}
-
 /// Quote a string to make it suitable as a literal Python string.
 fn quote_string<E>(out: &mut E, input: &str) -> Result<()>
     where E: ElementFormat

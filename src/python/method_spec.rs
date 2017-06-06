@@ -70,6 +70,6 @@ impl From<MethodSpec> for Element {
             out.push(Nested(Box::new(value.elements.into())));
         }
 
-        Elements(out)
+        Inner(out)
     }
 }
