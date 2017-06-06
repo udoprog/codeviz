@@ -1,7 +1,6 @@
-use common::Element;
+use super::element::*;
 use super::name::{Name, BuiltInName, ImportedName};
 use super::statement::Statement;
-use super::variable::Variable;
 
 #[derive(Debug, Clone)]
 pub struct DecoratorSpec {
@@ -46,8 +45,8 @@ impl From<ImportedName> for DecoratorSpec {
     }
 }
 
-impl From<DecoratorSpec> for Element<Variable> {
-    fn from(value: DecoratorSpec) -> Element<Variable> {
+impl From<DecoratorSpec> for Element {
+    fn from(value: DecoratorSpec) -> Element {
         let mut decl = Statement::new();
 
         decl.push("@");

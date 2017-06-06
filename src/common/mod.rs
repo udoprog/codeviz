@@ -1,9 +1,9 @@
 mod element_format;
 mod element_formatter;
-mod element;
-mod statement;
 mod elements;
+mod statement;
 mod variable_format;
+pub mod element;
 
 pub use self::element_format::*;
 pub use self::element_formatter::*;

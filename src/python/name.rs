@@ -1,5 +1,5 @@
-use errors::*;
 use common::ElementFormat;
+use errors::*;
 use super::variable::Variable;
 
 #[derive(Debug, Clone)]
