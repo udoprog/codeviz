@@ -6,6 +6,7 @@ pub mod errors;
 pub mod java;
 pub mod js;
 pub mod python;
+pub mod rust;
 
 /// Macro to build statements.
 ///
