@@ -48,6 +48,9 @@ impl Imports for Variable {
             Variable::Statement(ref stmt) => {
                 stmt.imports(receiver);
             }
+            Variable::Element(ref element) => {
+                element.imports(receiver);
+            }
             _ => {}
         }
     }
