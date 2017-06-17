@@ -8,6 +8,7 @@ pub struct EnumSpec {
     pub name: String,
     pub attributes: Elements,
     pub elements: Elements,
+    pub public: bool,
 }
 
 impl EnumSpec {
@@ -16,7 +17,12 @@ impl EnumSpec {
             name: name.to_owned(),
             attributes: Elements::new(),
             elements: Elements::new(),
+            public: false,
         }
+    }
+
+    pub fn public(&mut self) {
+        self.public = true;
     }
 
     pub fn push_attribute<D>(&mut self, attribute: D)
@@ -39,6 +45,11 @@ impl From<EnumSpec> for Element<Variable> {
         out.push(value.attributes);
 
         let mut decl = Statement::new();
+
+        if value.public {
+            decl.push("pub ");
+        }
+
         decl.push("enum ");
         decl.push(value.name);
         decl.push(" {");
