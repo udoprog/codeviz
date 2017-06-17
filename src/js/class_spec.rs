@@ -7,6 +7,7 @@ pub struct ClassSpec {
     pub name: String,
     pub constructors: Elements,
     pub elements: Elements,
+    pub export: bool,
 }
 
 impl ClassSpec {
@@ -15,7 +16,12 @@ impl ClassSpec {
             name: name.to_owned(),
             constructors: Elements::new(),
             elements: Elements::new(),
+            export: false,
         }
+    }
+
+    pub fn export(&mut self) {
+        self.export = true;
     }
 
     pub fn push_constructor<E>(&mut self, element: E)
@@ -34,6 +40,10 @@ impl ClassSpec {
 impl From<ClassSpec> for Element {
     fn from(value: ClassSpec) -> Element {
         let mut open = Statement::new();
+
+        if value.export {
+            open.push("export ");
+        }
 
         open.push("class ");
         open.push(value.name);
