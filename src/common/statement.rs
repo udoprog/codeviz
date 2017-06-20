@@ -45,11 +45,11 @@ impl<Var> Statement<Var>
         Statement { parts: parts }
     }
 
-    pub fn format<E>(&self, out: &mut E, depth: usize) -> Result<()>
+    pub fn format<E>(&self, out: &mut E, depth: usize, extra: &mut Var::Extra) -> Result<()>
         where E: ElementFormat
     {
         for part in &self.parts {
-            part.format(out, depth)?;
+            part.format(out, depth, extra)?;
         }
 
         Ok(())

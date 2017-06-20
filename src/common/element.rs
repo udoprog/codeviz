@@ -19,16 +19,16 @@ pub enum Element<Var>
 impl<Var> Element<Var>
     where Var: VariableFormat
 {
-    pub fn format<E>(&self, out: &mut E) -> Result<()>
+    pub fn format<E>(&self, out: &mut E, extra: &mut Var::Extra) -> Result<()>
         where E: ElementFormat
     {
         match *self {
             Element::Push(ref statement) => {
                 out.new_line_unless_empty()?;
-                statement.format(out, 0usize)?;
+                statement.format(out, 0usize, extra)?;
             }
             Element::Concat(ref statement) => {
-                statement.format(out, 0usize)?;
+                statement.format(out, 0usize, extra)?;
             }
             Element::Literal(ref line) => {
                 out.new_line_unless_empty()?;
@@ -36,14 +36,14 @@ impl<Var> Element<Var>
             }
             Element::Inner(ref elements) => {
                 for element in elements {
-                    element.format(out)?;
+                    element.format(out, extra)?;
                 }
             }
             Element::Nested(ref element) => {
                 out.new_line_unless_empty()?;
 
                 out.indent();
-                element.format(out)?;
+                element.format(out, extra)?;
                 out.unindent();
             }
             Element::Spacing => {
@@ -94,7 +94,8 @@ impl<Var> ToString for Element<Var>
 {
     fn to_string(&self) -> String {
         let mut s = String::new();
-        self.format(&mut ::common::ElementFormatter::new(&mut s)).unwrap();
+        let mut extra = Var::Extra::default();
+        self.format(&mut ::common::ElementFormatter::new(&mut s), &mut extra).unwrap();
         s
     }
 }

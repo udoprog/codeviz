@@ -4,6 +4,7 @@ use errors::*;
 use super::_type::Type;
 use super::element::Element;
 use super::statement::Statement;
+use super::extra::Extra;
 
 #[derive(Debug, Clone)]
 pub enum Variable {
@@ -16,15 +17,17 @@ pub enum Variable {
 }
 
 impl VariableFormat for Variable {
-    fn format<E>(&self, out: &mut E, depth: usize) -> Result<()>
+    type Extra = Extra;
+
+    fn format<E>(&self, out: &mut E, depth: usize, extra: &mut Extra) -> Result<()>
         where E: ElementFormat
     {
         match *self {
-            Variable::Type(ref ty) => ty.format(out, depth)?,
+            Variable::Type(ref ty) => ty.format(out, depth, extra)?,
             Variable::String(ref string) => java_quote_string(out, string)?,
-            Variable::Statement(ref stmt) => stmt.format(out, depth)?,
+            Variable::Statement(ref stmt) => stmt.format(out, depth, extra)?,
             Variable::Literal(ref content) => out.write_str(content)?,
-            Variable::Element(ref element) => element.format(out)?,
+            Variable::Element(ref element) => element.format(out, extra)?,
             Variable::Spacing => out.new_line()?,
         };
 

@@ -1,6 +1,7 @@
 use errors::*;
 use common::ElementFormat;
 use super::variable::Variable;
+use super::extra::Extra;
 
 /// Complete types, including generic arguments.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
@@ -36,7 +37,12 @@ impl ClassType {
         ClassType::new(&self.package, &self.name, vec![])
     }
 
-    pub fn format(&self, out: &mut ElementFormat, level: usize) -> Result<()> {
+    pub fn format(&self, out: &mut ElementFormat, level: usize, extra: &mut Extra) -> Result<()> {
+        // use fully qualified name if locals are occupied.
+        if extra.absolute_import(&self.name, self) {
+            write!(out, "{}.", self.package)?;
+        }
+
         out.write_str(&self.name)?;
 
         if !self.arguments.is_empty() {
@@ -47,7 +53,7 @@ impl ClassType {
             out.write_char('<')?;
 
             while let Some(g) = it.next() {
-                g.format(out, level)?;
+                g.format(out, level, extra)?;
 
                 if it.peek().is_some() {
                     out.write_str(", ")?;
@@ -116,10 +122,10 @@ impl Type {
         Local::new(name)
     }
 
-    pub fn format(&self, out: &mut ElementFormat, level: usize) -> Result<()> {
+    pub fn format(&self, out: &mut ElementFormat, level: usize, extra: &mut Extra) -> Result<()> {
         match *self {
             Type::Primitive(ref primitive) => primitive.format(out, level),
-            Type::Class(ref class) => class.format(out, level),
+            Type::Class(ref class) => class.format(out, level, extra),
             Type::Local(ref local) => local.format(out),
         }
     }

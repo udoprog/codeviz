@@ -19,6 +19,7 @@ mod method_spec;
 mod modifier;
 mod statement;
 mod variable;
+mod extra;
 
 pub use self::_type::*;
 pub use self::annotation_spec::*;

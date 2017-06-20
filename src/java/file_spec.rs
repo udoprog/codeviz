@@ -1,10 +1,12 @@
 use errors::*;
 use common::ElementFormatter;
 use super::_type::ClassType;
+use std::collections::HashMap;
 use super::element::*;
 use super::elements::Elements;
 use super::imports::{Imports, ImportReceiver};
 use super::statement::Statement;
+use super::extra::Extra;
 
 use std::collections::BTreeSet;
 
@@ -40,6 +42,8 @@ impl FileSpec {
 
         file.push(package);
 
+        let mut locals: HashMap<String, ClassType> = HashMap::new();
+
         let mut receiver: BTreeSet<ClassType> = BTreeSet::new();
 
         self.elements.imports(&mut receiver);
@@ -54,6 +58,12 @@ impl FileSpec {
             let mut imported = Elements::new();
 
             for t in imports {
+                if let Some(_) = locals.get(&t.name) {
+                    continue;
+                }
+
+                locals.insert(t.name.clone(), t.to_raw());
+
                 let mut import = Statement::new();
 
                 import.push("import ");
@@ -72,8 +82,9 @@ impl FileSpec {
         file.push(content);
 
         let file: Element = file.join(Spacing).into();
+        let mut extra = Extra::with_locals(locals);
 
-        file.format(&mut ElementFormatter::new(out))?;
+        file.format(&mut ElementFormatter::new(out), &mut extra)?;
         out.write_char('\n')?;
 
         Ok(())

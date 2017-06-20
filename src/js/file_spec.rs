@@ -102,8 +102,9 @@ impl FileSpec {
         elements.push(self.elements.clone().join(Spacing));
 
         let elements: Element = elements.join(Spacing).into();
+        let mut extra = ();
 
-        elements.format(&mut ElementFormatter::new(out))?;
+        elements.format(&mut ElementFormatter::new(out), &mut extra)?;
         out.write_char('\n')?;
 
         Ok(())
