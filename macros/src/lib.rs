@@ -6,9 +6,10 @@
 ///
 /// ```
 /// #[macro_use]
-/// extern crate codeviz;
+/// extern crate codeviz_macros;
+/// extern crate codeviz_java;
 ///
-/// use codeviz::java::*;
+/// use codeviz_java::*;
 ///
 /// pub fn main() {
 ///   let stmt1 = stmt![Variable::Literal("hello".to_owned())];
@@ -37,9 +38,10 @@ macro_rules! stmt {
 ///
 /// ```
 /// #[macro_use]
-/// extern crate codeviz;
+/// extern crate codeviz_macros;
+/// extern crate codeviz_java;
 ///
-/// use codeviz::java::*;
+/// use codeviz_java::*;
 ///
 /// pub fn main() {
 ///   let mods = mods![Modifier::Private, Modifier::Static];
