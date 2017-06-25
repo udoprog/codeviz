@@ -1,67 +1,30 @@
+#[cfg(test)]
 #[macro_use]
-extern crate error_chain;
+extern crate codeviz_macros;
+extern crate codeviz_common;
+extern crate codeviz_java;
+extern crate codeviz_js;
+extern crate codeviz_python;
+extern crate codeviz_rust;
 
-pub mod common;
-pub mod errors;
-pub mod java;
-pub mod js;
-pub mod python;
-pub mod rust;
-
-/// Macro to build statements.
-///
-/// # Examples
-///
-/// All of these are equivalent:
-///
-/// ```
-/// #[macro_use]
-/// extern crate codeviz;
-///
-/// use codeviz::java::*;
-///
-/// pub fn main() {
-///   let stmt1 = stmt![Variable::Literal("hello".to_owned())];
-///
-///   let stmt2 = stmt!["hello"];
-///
-///   let stmt3 = {
-///     let mut s = Statement::new();
-///     s.push("hello");
-///     s
-///   };
-/// }
-/// ```
-#[macro_export]
-macro_rules! stmt {
-    ($($var:expr),*) => {{
-        let mut statement = Statement::new();
-        $(statement.push($var);)*
-        statement
-    }};
+pub mod common {
+    pub use codeviz_common::*;
 }
 
-/// Build a modifier list.
-///
-/// # Examples
-///
-/// ```
-/// #[macro_use]
-/// extern crate codeviz;
-///
-/// use codeviz::java::*;
-///
-/// pub fn main() {
-///   let mods = mods![Modifier::Private, Modifier::Static];
-/// }
-/// ```
-#[macro_export]
-macro_rules! mods {
-    ($($modifier:expr),*) => {{
-        let mut modifiers = Modifiers::new();
-        $(modifiers.insert($modifier);)*
-        modifiers
-    }}
+pub mod java {
+    pub use codeviz_java::*;
+}
+
+pub mod js {
+    pub use codeviz_js::*;
+}
+
+pub mod python {
+    pub use codeviz_python::*;
+}
+
+pub mod rust {
+    pub use codeviz_rust::*;
 }
 
 #[cfg(test)]

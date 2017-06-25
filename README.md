@@ -13,9 +13,10 @@ This project is inspired by JavaPoet (https://github.com/square/javapoet)
 
 ```rust
 #[macro_use]
-extern crate codeviz;
+extern crate codeviz_macros;
+extern crate codeviz_java;
 
-use codeviz::java::*;
+use codeviz_java::*;
 
 fn main() {
   let string_type = Type::class("java.lang", "String");
