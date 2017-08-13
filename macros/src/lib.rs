@@ -30,6 +30,12 @@ macro_rules! stmt {
         $(statement.push($var);)*
         statement
     }};
+
+    ($($var:expr,)*) => {{
+        let mut statement = Statement::new();
+        $(statement.push($var);)*
+        statement
+    }};
 }
 
 /// Build a modifier list.
@@ -53,5 +59,11 @@ macro_rules! mods {
         let mut modifiers = Modifiers::new();
         $(modifiers.insert($modifier);)*
         modifiers
-    }}
+    }};
+
+    ($($modifier:expr,)*) => {{
+        let mut modifiers = Modifiers::new();
+        $(modifiers.insert($modifier);)*
+        modifiers
+    }};
 }
