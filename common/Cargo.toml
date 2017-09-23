@@ -12,4 +12,4 @@ Flexible code generator for Rust
 """
 
 [dependencies]
-error-chain = "0.10.0"
+error-chain = "0.11"
