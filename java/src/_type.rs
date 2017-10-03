@@ -19,16 +19,19 @@ impl ClassType {
     }
 
     pub fn with_arguments<A>(&self, arguments: Vec<A>) -> ClassType
-        where A: Into<Type>
+    where
+        A: Into<Type>,
     {
         let arguments = arguments.into_iter().map(Into::into).collect();
         ClassType::new(&self.package, &self.name, arguments)
     }
 
     pub fn extend(&self, part: &str) -> ClassType {
-        ClassType::new(&self.package,
-                       &format!("{}.{}", self.name, part),
-                       self.arguments.clone())
+        ClassType::new(
+            &self.package,
+            &format!("{}.{}", self.name, part),
+            self.arguments.clone(),
+        )
     }
 
     pub fn to_raw(&self) -> ClassType {
@@ -130,7 +133,8 @@ impl Type {
 }
 
 impl<'a, T> From<&'a T> for ClassType
-    where T: Into<ClassType> + Clone
+where
+    T: Into<ClassType> + Clone,
 {
     fn from(value: &'a T) -> ClassType {
         value.clone().into()
@@ -138,7 +142,8 @@ impl<'a, T> From<&'a T> for ClassType
 }
 
 impl<'a, A> From<&'a A> for Type
-    where A: Into<Type> + Clone
+where
+    A: Into<Type> + Clone,
 {
     fn from(value: &'a A) -> Type {
         value.clone().into()

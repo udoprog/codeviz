@@ -16,7 +16,8 @@ impl VariableFormat for Variable {
     type Extra = Extra;
 
     fn format<E>(&self, out: &mut E, depth: usize, extra: &mut Extra) -> Result<()>
-        where E: ElementFormat
+    where
+        E: ElementFormat,
     {
         match *self {
             Variable::Type(ref ty) => ty.format(out, depth, extra)?,
@@ -32,7 +33,8 @@ impl VariableFormat for Variable {
 }
 
 impl<'a, T> From<&'a T> for Variable
-    where T: Into<Variable> + Clone
+where
+    T: Into<Variable> + Clone,
 {
     fn from(value: &'a T) -> Variable {
         value.clone().into()

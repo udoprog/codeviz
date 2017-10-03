@@ -25,7 +25,8 @@ impl InterfaceSpec {
     }
 
     pub fn extends<T>(&mut self, ty: T)
-        where T: Into<ClassType>
+    where
+        T: Into<ClassType>,
     {
         self.extends.push(ty.into());
     }

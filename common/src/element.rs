@@ -2,7 +2,8 @@ use super::*;
 
 #[derive(Debug, Clone)]
 pub enum Element<Var>
-    where Var: VariableFormat
+where
+    Var: VariableFormat,
 {
     Push(Statement<Var>),
     Concat(Statement<Var>),
@@ -13,10 +14,12 @@ pub enum Element<Var>
 }
 
 impl<Var> Element<Var>
-    where Var: VariableFormat
+where
+    Var: VariableFormat,
 {
     pub fn format<E>(&self, out: &mut E, extra: &mut Var::Extra) -> Result<()>
-        where E: ElementFormat
+    where
+        E: ElementFormat,
     {
         match *self {
             Element::Push(ref statement) => {
@@ -53,8 +56,9 @@ impl<Var> Element<Var>
 }
 
 impl<'a, T, Var> From<&'a T> for Element<Var>
-    where T: Into<Element<Var>> + Clone,
-          Var: VariableFormat
+where
+    T: Into<Element<Var>> + Clone,
+    Var: VariableFormat,
 {
     fn from(value: &'a T) -> Element<Var> {
         value.clone().into()
@@ -62,7 +66,8 @@ impl<'a, T, Var> From<&'a T> for Element<Var>
 }
 
 impl<'a, Var> From<&'a str> for Element<Var>
-    where Var: VariableFormat
+where
+    Var: VariableFormat,
 {
     fn from(value: &'a str) -> Element<Var> {
         Element::Literal(value.to_owned())
@@ -70,7 +75,8 @@ impl<'a, Var> From<&'a str> for Element<Var>
 }
 
 impl<Var> From<Elements<Var>> for Element<Var>
-    where Var: VariableFormat
+where
+    Var: VariableFormat,
 {
     fn from(value: Elements<Var>) -> Element<Var> {
         Element::Inner(value.elements)
@@ -78,7 +84,8 @@ impl<Var> From<Elements<Var>> for Element<Var>
 }
 
 impl<Var> From<Vec<String>> for Element<Var>
-    where Var: VariableFormat
+where
+    Var: VariableFormat,
 {
     fn from(value: Vec<String>) -> Element<Var> {
         Element::Inner(value.into_iter().map(Element::Literal).collect())
@@ -86,12 +93,14 @@ impl<Var> From<Vec<String>> for Element<Var>
 }
 
 impl<Var> ToString for Element<Var>
-    where Var: VariableFormat
+where
+    Var: VariableFormat,
 {
     fn to_string(&self) -> String {
         let mut s = String::new();
         let mut extra = Var::Extra::default();
-        self.format(&mut ElementFormatter::new(&mut s), &mut extra).unwrap();
+        self.format(&mut ElementFormatter::new(&mut s), &mut extra)
+            .unwrap();
         s
     }
 }

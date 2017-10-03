@@ -10,7 +10,8 @@ pub struct ArgumentSpec {
 
 impl ArgumentSpec {
     pub fn new<I>(modifiers: Modifiers, ty: I, name: &str) -> ArgumentSpec
-        where I: Into<Type>
+    where
+        I: Into<Type>,
     {
         ArgumentSpec {
             modifiers: modifiers,
@@ -25,14 +26,6 @@ impl ArgumentSpec {
     }
 }
 
-impl<'a, A> From<&'a A> for ArgumentSpec
-    where A: Into<ArgumentSpec> + Clone
-{
-    fn from(value: &'a A) -> ArgumentSpec {
-        value.clone().into()
-    }
-}
-
 impl From<ArgumentSpec> for Variable {
     fn from(value: ArgumentSpec) -> Variable {
         Variable::Literal(value.name)
@@ -44,7 +37,7 @@ impl From<ArgumentSpec> for Statement {
         let mut s = Statement::new();
 
         for a in &value.annotations {
-            s.push(Variable::Statement(a.into()));
+            s.push(a);
             s.push(" ");
         }
 

@@ -10,7 +10,8 @@ pub struct FieldSpec {
 
 impl FieldSpec {
     pub fn new<I>(modifiers: Modifiers, ty: I, name: &str) -> FieldSpec
-        where I: Into<Type>
+    where
+        I: Into<Type>,
     {
         FieldSpec {
             modifiers: modifiers,
@@ -21,14 +22,16 @@ impl FieldSpec {
     }
 
     pub fn initialize<S>(&mut self, initialize: S)
-        where S: Into<Statement>
+    where
+        S: Into<Statement>,
     {
         self.initialize = Some(initialize.into());
     }
 }
 
 impl<'a, T> From<&'a T> for FieldSpec
-    where T: Into<FieldSpec> + Clone
+where
+    T: Into<FieldSpec> + Clone,
 {
     fn from(value: &'a T) -> FieldSpec {
         value.clone().into()

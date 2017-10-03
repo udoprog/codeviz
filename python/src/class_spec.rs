@@ -19,19 +19,22 @@ impl ClassSpec {
     }
 
     pub fn push_decorator<D>(&mut self, decorator: D)
-        where D: Into<DecoratorSpec>
+    where
+        D: Into<DecoratorSpec>,
     {
         self.decorators.push(decorator.into());
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<Element>
+    where
+        E: Into<Element>,
     {
         self.elements.push(element);
     }
 
     pub fn extends<N>(&mut self, name: N)
-        where N: Into<Name>
+    where
+        N: Into<Name>,
     {
         self.extends.push(name.into());
     }

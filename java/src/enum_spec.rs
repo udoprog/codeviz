@@ -27,7 +27,8 @@ impl EnumSpec {
     }
 
     pub fn push_value<E>(&mut self, value: E)
-        where E: Into<Element>
+    where
+        E: Into<Element>,
     {
         self.values.push(value);
     }
@@ -87,7 +88,7 @@ impl From<EnumSpec> for Element {
             let mut fields = Elements::new();
 
             for field in &value.fields {
-                let mut field: Statement = field.into();
+                let mut field: Statement = field.clone().into();
                 field.push(";");
                 fields.push(field);
             }

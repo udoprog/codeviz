@@ -8,7 +8,8 @@ pub struct DecoratorSpec {
 
 impl DecoratorSpec {
     pub fn new<N>(name: N) -> DecoratorSpec
-        where N: Into<Name>
+    where
+        N: Into<Name>,
     {
         DecoratorSpec {
             name: name.into(),
@@ -17,14 +18,16 @@ impl DecoratorSpec {
     }
 
     pub fn push_argument<S>(&mut self, statement: S)
-        where S: Into<Statement>
+    where
+        S: Into<Statement>,
     {
         self.arguments.push(statement.into());
     }
 }
 
 impl<'a, T> From<&'a T> for DecoratorSpec
-    where T: Into<DecoratorSpec> + Clone
+where
+    T: Into<DecoratorSpec> + Clone,
 {
     fn from(value: &'a T) -> DecoratorSpec {
         value.clone().into()

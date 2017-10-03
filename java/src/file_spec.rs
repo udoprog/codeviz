@@ -17,13 +17,15 @@ impl FileSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<Element>
+    where
+        E: Into<Element>,
     {
         self.elements.push(element);
     }
 
     pub fn format<'a, W>(&'a self, out: &mut W) -> Result<()>
-        where W: ::std::fmt::Write
+    where
+        W: ::std::fmt::Write,
     {
         let mut file = Elements::new();
 
@@ -40,7 +42,8 @@ impl FileSpec {
 
         self.elements.imports(&mut receiver);
 
-        let imports: BTreeSet<ClassType> = receiver.into_iter()
+        let imports: BTreeSet<ClassType> = receiver
+            .into_iter()
             .filter(|t| t.package != "java.lang")
             .filter(|t| t.package != self.package)
             .map(|t| t.to_raw())

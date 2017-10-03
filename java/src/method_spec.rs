@@ -25,31 +25,36 @@ impl MethodSpec {
     }
 
     pub fn push_annotation<A>(&mut self, annotation: A)
-        where A: Into<AnnotationSpec>
+    where
+        A: Into<AnnotationSpec>,
     {
         self.annotations.push(annotation.into());
     }
 
     pub fn push_argument<A>(&mut self, argument: A)
-        where A: Into<ArgumentSpec>
+    where
+        A: Into<ArgumentSpec>,
     {
         self.arguments.push(argument.into());
     }
 
     pub fn returns<T>(&mut self, returns: T)
-        where T: Into<Type>
+    where
+        T: Into<Type>,
     {
         self.returns = Some(returns.into())
     }
 
     pub fn throws<T>(&mut self, throws: T)
-        where T: Into<ClassType>
+    where
+        T: Into<ClassType>,
     {
         self.throws.push(throws.into())
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<Element>
+    where
+        E: Into<Element>,
     {
         self.elements.push(element);
     }

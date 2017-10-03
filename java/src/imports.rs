@@ -4,8 +4,9 @@ pub trait ImportReceiver {
     fn receive(&mut self, ty: &ClassType);
 
     fn import_all<T>(&mut self, sources: &Vec<T>)
-        where T: Imports,
-              Self: Sized
+    where
+        T: Imports,
+        Self: Sized,
     {
         for source in sources {
             source.imports(self);
@@ -14,12 +15,15 @@ pub trait ImportReceiver {
 }
 
 pub trait Imports {
-    fn imports<I>(&self, &mut I) where I: ImportReceiver;
+    fn imports<I>(&self, &mut I)
+    where
+        I: ImportReceiver;
 }
 
 impl Imports for Element {
     fn imports<I>(&self, receiver: &mut I)
-        where I: ImportReceiver
+    where
+        I: ImportReceiver,
     {
         match *self {
             Inner(ref elements) => receiver.import_all(elements),
@@ -35,7 +39,8 @@ impl Imports for Element {
 
 impl Imports for Variable {
     fn imports<I>(&self, receiver: &mut I)
-        where I: ImportReceiver
+    where
+        I: ImportReceiver,
     {
         match *self {
             Variable::Type(ref ty) => {
@@ -54,7 +59,8 @@ impl Imports for Variable {
 
 impl Imports for Statement {
     fn imports<I>(&self, receiver: &mut I)
-        where I: ImportReceiver
+    where
+        I: ImportReceiver,
     {
         receiver.import_all(&self.parts);
     }
@@ -62,7 +68,8 @@ impl Imports for Statement {
 
 impl Imports for Elements {
     fn imports<I>(&self, receiver: &mut I)
-        where I: ImportReceiver
+    where
+        I: ImportReceiver,
     {
         receiver.import_all(&self.elements);
     }
@@ -70,7 +77,8 @@ impl Imports for Elements {
 
 impl Imports for ClassType {
     fn imports<I>(&self, receiver: &mut I)
-        where I: ImportReceiver
+    where
+        I: ImportReceiver,
     {
         receiver.receive(self);
         receiver.import_all(&self.arguments);
@@ -79,7 +87,8 @@ impl Imports for ClassType {
 
 impl Imports for Type {
     fn imports<I>(&self, receiver: &mut I)
-        where I: ImportReceiver
+    where
+        I: ImportReceiver,
     {
         match *self {
             Type::Class(ref class) => class.imports(receiver),

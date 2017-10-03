@@ -1,7 +1,8 @@
 use super::*;
 
 pub fn implements<'a, I>(implements: I, dest: &mut Statement)
-    where I: IntoIterator<Item = &'a ClassType>
+where
+    I: IntoIterator<Item = &'a ClassType>,
 {
     let mut it = implements.into_iter();
 
@@ -18,9 +19,10 @@ pub fn implements<'a, I>(implements: I, dest: &mut Statement)
 }
 
 pub fn join_statements<Iter, Item, Sep>(statements: Iter, separator: Sep) -> Statement
-    where Iter: IntoIterator<Item = Item>,
-          Item: Into<Statement>,
-          Sep: Into<Variable> + Clone
+where
+    Iter: IntoIterator<Item = Item>,
+    Item: Into<Statement>,
+    Sep: Into<Variable> + Clone,
 {
     let mut it = statements.into_iter();
 

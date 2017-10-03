@@ -28,13 +28,15 @@ impl MethodSpec {
     }
 
     pub fn push_argument<S>(&mut self, argument: S)
-        where S: Into<Statement>
+    where
+        S: Into<Statement>,
     {
         self.arguments.push(argument.into());
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<Element>
+    where
+        E: Into<Element>,
     {
         self.elements.push(element);
     }

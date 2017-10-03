@@ -3,7 +3,8 @@ use std::iter;
 use super::*;
 
 pub struct ElementFormatter<'a, W>
-    where W: fmt::Write + 'a
+where
+    W: fmt::Write + 'a,
 {
     write: &'a mut W,
     // if last line was empty.
@@ -15,7 +16,8 @@ pub struct ElementFormatter<'a, W>
 }
 
 impl<'a, W> ElementFormatter<'a, W>
-    where W: fmt::Write
+where
+    W: fmt::Write,
 {
     pub fn new(write: &mut W) -> ElementFormatter<W> {
         ElementFormatter {
@@ -28,7 +30,9 @@ impl<'a, W> ElementFormatter<'a, W>
 
     fn check_indent(&mut self) -> fmt::Result {
         if self.last_line_empty {
-            self.write.write_str(&self.indent_buffer[0..self.indent * 2])?;
+            self.write.write_str(
+                &self.indent_buffer[0..self.indent * 2],
+            )?;
         }
 
         self.last_line_empty = false;
@@ -37,7 +41,8 @@ impl<'a, W> ElementFormatter<'a, W>
 }
 
 impl<'a, W> fmt::Write for ElementFormatter<'a, W>
-    where W: fmt::Write
+where
+    W: fmt::Write,
 {
     fn write_str(&mut self, s: &str) -> fmt::Result {
         self.check_indent()?;
@@ -56,7 +61,8 @@ impl<'a, W> fmt::Write for ElementFormatter<'a, W>
 }
 
 impl<'a, W> ElementFormat for ElementFormatter<'a, W>
-    where W: fmt::Write
+where
+    W: fmt::Write,
 {
     fn new_line(&mut self) -> Result<()> {
         self.write.write_char('\n')?;

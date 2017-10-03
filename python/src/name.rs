@@ -34,7 +34,8 @@ impl Name {
     }
 
     pub fn format<E>(&self, out: &mut E) -> Result<()>
-        where E: ElementFormat
+    where
+        E: ElementFormat,
     {
         match *self {
             Name::Imported(ref imported) => {
@@ -70,7 +71,8 @@ pub struct LocalName {
 }
 
 impl<'a, T> From<&'a T> for Name
-    where T: Into<Name> + Clone
+where
+    T: Into<Name> + Clone,
 {
     fn from(value: &'a T) -> Name {
         value.clone().into()

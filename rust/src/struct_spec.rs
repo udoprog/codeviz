@@ -23,13 +23,15 @@ impl StructSpec {
     }
 
     pub fn push_attribute<D>(&mut self, attribute: D)
-        where D: Into<Element>
+    where
+        D: Into<Element>,
     {
         self.attributes.push(attribute.into());
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<Element>
+    where
+        E: Into<Element>,
     {
         self.elements.push(element);
     }

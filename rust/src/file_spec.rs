@@ -13,7 +13,8 @@ impl FileSpec {
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<Element>
+    where
+        E: Into<Element>,
     {
         self.elements.push(element);
     }
@@ -23,8 +24,10 @@ impl FileSpec {
 
         self.elements.imports(&mut imports);
 
-        let modules: BTreeSet<(String, Option<String>)> =
-            imports.into_iter().map(|imported| (imported.module, imported.alias)).collect();
+        let modules: BTreeSet<(String, Option<String>)> = imports
+            .into_iter()
+            .map(|imported| (imported.module, imported.alias))
+            .collect();
 
         if modules.is_empty() {
             return None;
@@ -52,7 +55,8 @@ impl FileSpec {
     }
 
     pub fn format<W>(&self, out: &mut W) -> Result<()>
-        where W: ::std::fmt::Write
+    where
+        W: ::std::fmt::Write,
     {
         let mut elements = Elements::new();
 

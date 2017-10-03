@@ -19,19 +19,22 @@ impl MethodSpec {
     }
 
     pub fn push_decorator<D>(&mut self, decorator: D)
-        where D: Into<DecoratorSpec>
+    where
+        D: Into<DecoratorSpec>,
     {
         self.decorators.push(decorator.into());
     }
 
     pub fn push_argument<S>(&mut self, argument: S)
-        where S: Into<Statement>
+    where
+        S: Into<Statement>,
     {
         self.arguments.push(argument.into());
     }
 
     pub fn push<E>(&mut self, element: E)
-        where E: Into<Element>
+    where
+        E: Into<Element>,
     {
         self.elements.push(element);
     }

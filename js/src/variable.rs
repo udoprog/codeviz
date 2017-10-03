@@ -19,7 +19,8 @@ impl VariableFormat for Variable {
     type Extra = ();
 
     fn format<E>(&self, out: &mut E, depth: usize, extra: &mut ()) -> Result<()>
-        where E: ElementFormat
+    where
+        E: ElementFormat,
     {
         match *self {
             Variable::String(ref string) => {
@@ -41,7 +42,8 @@ impl VariableFormat for Variable {
 }
 
 impl<'a, A> From<&'a A> for Variable
-    where A: Into<Variable> + Clone
+where
+    A: Into<Variable> + Clone,
 {
     fn from(value: &'a A) -> Variable {
         value.clone().into()
@@ -92,7 +94,8 @@ impl From<LocalName> for Variable {
 
 /// Quote a string to make it suitable as a literal JavaScript string.
 pub fn quote_string<E>(out: &mut E, input: &str) -> Result<()>
-    where E: ElementFormat
+where
+    E: ElementFormat,
 {
     out.write_char('"')?;
 

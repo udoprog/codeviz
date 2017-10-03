@@ -1,36 +1,9 @@
-[package]
-name = "codeviz"
-version = "0.2.0"
-authors = ["John-John Tedro <udoprog@tedro.se>"]
-license = "MIT/Apache-2.0"
-readme = "README.md"
-repository = "https://github.com/udoprog/codeviz"
-homepage = "https://github.com/udoprog/codeviz"
-documentation = "https://docs.rs/codeviz"
-description = """
-Flexible code generator for Rust
-"""
-
-[dependencies.codeviz_common]
-version = "0.2.0"
-path = "./common"
-
-[dependencies.codeviz_rust]
-version = "0.2.0"
-path = "./rust"
-
-[dependencies.codeviz_js]
-version = "0.2.0"
-path = "./js"
-
-[dependencies.codeviz_java]
-version = "0.2.0"
-path = "./java"
-
-[dependencies.codeviz_python]
-version = "0.2.0"
-path = "./python"
-
-[dev-dependencies.codeviz_macros]
-version = "0.2.0"
-path = "./macros"
+[workspace]
+members = [
+  "common",
+  "macros",
+  "java",
+  "rust",
+  "js",
+  "python",
+]

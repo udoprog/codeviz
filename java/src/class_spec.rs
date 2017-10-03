@@ -27,7 +27,8 @@ impl ClassSpec {
     }
 
     pub fn extends<T>(&mut self, ty: T)
-        where T: Into<ClassType>
+    where
+        T: Into<ClassType>,
     {
         self.extends = Some(ty.into());
     }
@@ -68,7 +69,7 @@ impl From<ClassSpec> for Element {
             let mut fields = Elements::new();
 
             for field in &value.fields {
-                let mut field: Statement = field.into();
+                let mut field: Statement = field.clone().into();
                 field.push(";");
                 fields.push(field);
             }

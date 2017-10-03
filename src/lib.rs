@@ -68,9 +68,11 @@ mod java_tests {
         let json_creator_type = Type::class("com.fasterxml.jackson.annotation", "JsonCreator");
         let list_of_strings = list_type.with_arguments(vec![&string_type]);
 
-        let values_field = FieldSpec::new(mods![Modifier::Private, Modifier::Final],
-                                          &list_of_strings,
-                                          "values");
+        let values_field = FieldSpec::new(
+            mods![Modifier::Private, Modifier::Final],
+            &list_of_strings,
+            "values",
+        );
 
         let values_argument = ArgumentSpec::new(mods![Modifier::Final], &list_of_strings, "values");
 
@@ -134,7 +136,9 @@ mod js_tests {
 
         let result = file.to_string();
 
-        assert_eq!("import {hello} from \"foo.js\";\n\nfunction foo() {\n  return hello();\n}\n",
-                   result);
+        assert_eq!(
+            "import {hello} from \"foo.js\";\n\nfunction foo() {\n  return hello();\n}\n",
+            result
+        );
     }
 }

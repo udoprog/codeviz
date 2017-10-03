@@ -4,8 +4,9 @@ pub trait ImportReceiver {
     fn receive(&mut self, name: &ImportedName);
 
     fn import_all<T>(&mut self, sources: &Vec<T>)
-        where T: Imports,
-              Self: Sized
+    where
+        T: Imports,
+        Self: Sized,
     {
         for source in sources {
             source.imports(self);
@@ -14,12 +15,15 @@ pub trait ImportReceiver {
 }
 
 pub trait Imports {
-    fn imports<I>(&self, receiver: &mut I) where I: ImportReceiver;
+    fn imports<I>(&self, receiver: &mut I)
+    where
+        I: ImportReceiver;
 }
 
 impl Imports for Name {
     fn imports<I>(&self, receiver: &mut I)
-        where I: ImportReceiver
+    where
+        I: ImportReceiver,
     {
         match *self {
             Name::Imported(ref imported) => receiver.receive(imported),
@@ -30,7 +34,8 @@ impl Imports for Name {
 
 impl Imports for Variable {
     fn imports<I>(&self, receiver: &mut I)
-        where I: ImportReceiver
+    where
+        I: ImportReceiver,
     {
         match *self {
             Variable::Statement(ref stmt) => {
@@ -46,7 +51,8 @@ impl Imports for Variable {
 
 impl Imports for Statement {
     fn imports<I>(&self, receiver: &mut I)
-        where I: ImportReceiver
+    where
+        I: ImportReceiver,
     {
         receiver.import_all(&self.parts);
     }
@@ -54,7 +60,8 @@ impl Imports for Statement {
 
 impl Imports for Element {
     fn imports<I>(&self, receiver: &mut I)
-        where I: ImportReceiver
+    where
+        I: ImportReceiver,
     {
         match *self {
             Push(ref statement) => {
@@ -73,7 +80,8 @@ impl Imports for Element {
 
 impl Imports for FunctionSpec {
     fn imports<I>(&self, receiver: &mut I)
-        where I: ImportReceiver
+    where
+        I: ImportReceiver,
     {
         receiver.import_all(&self.arguments);
         self.elements.imports(receiver);
@@ -82,7 +90,8 @@ impl Imports for FunctionSpec {
 
 impl Imports for Elements {
     fn imports<I>(&self, receiver: &mut I)
-        where I: ImportReceiver
+    where
+        I: ImportReceiver,
     {
         receiver.import_all(&self.elements);
     }

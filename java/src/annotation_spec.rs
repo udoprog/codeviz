@@ -8,7 +8,8 @@ pub struct AnnotationSpec {
 
 impl AnnotationSpec {
     pub fn new<I>(ty: I) -> AnnotationSpec
-        where I: Into<Type>
+    where
+        I: Into<Type>,
     {
         AnnotationSpec {
             ty: ty.into(),
@@ -17,14 +18,16 @@ impl AnnotationSpec {
     }
 
     pub fn push_argument<S>(&mut self, statement: S)
-        where S: Into<Statement>
+    where
+        S: Into<Statement>,
     {
         self.arguments.push(statement.into());
     }
 }
 
 impl<'a, T> From<&'a T> for AnnotationSpec
-    where T: Into<AnnotationSpec> + Clone
+where
+    T: Into<AnnotationSpec> + Clone,
 {
     fn from(value: &'a T) -> AnnotationSpec {
         value.clone().into()
@@ -64,8 +67,8 @@ impl From<AnnotationSpec> for Element {
     }
 }
 
-impl From<AnnotationSpec> for Statement {
-    fn from(value: AnnotationSpec) -> Statement {
-        Statement { parts: vec![Variable::Element(value.into())] }
+impl From<AnnotationSpec> for Variable {
+    fn from(value: AnnotationSpec) -> Self {
+        Variable::Element(value.into())
     }
 }
