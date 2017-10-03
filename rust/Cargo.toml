@@ -1,6 +1,6 @@
 [package]
 name = "codeviz_rust"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["John-John Tedro <udoprog@tedro.se>"]
 license = "MIT/Apache-2.0"
 readme = "../README.md"
@@ -12,5 +12,5 @@ Flexible code generator for Rust
 """
 
 [dependencies.codeviz_common]
-version = "0.2.0"
+version = "0.2.1"
 path = "../common"

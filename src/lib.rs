@@ -1,31 +1,11 @@
 #[cfg(test)]
 #[macro_use]
-extern crate codeviz_macros;
-extern crate codeviz_common;
-extern crate codeviz_java;
-extern crate codeviz_js;
-extern crate codeviz_python;
-extern crate codeviz_rust;
-
-pub mod common {
-    pub use codeviz_common::*;
-}
-
-pub mod java {
-    pub use codeviz_java::*;
-}
-
-pub mod js {
-    pub use codeviz_js::*;
-}
-
-pub mod python {
-    pub use codeviz_python::*;
-}
-
-pub mod rust {
-    pub use codeviz_rust::*;
-}
+pub extern crate codeviz_macros;
+pub extern crate codeviz_common as common;
+pub extern crate codeviz_java as java;
+pub extern crate codeviz_js as js;
+pub extern crate codeviz_python as python;
+pub extern crate codeviz_rust as rust;
 
 #[cfg(test)]
 mod python_tests {
@@ -78,7 +58,7 @@ mod java_tests {
 
         let mut constructor = ConstructorSpec::new(mods![Modifier::Public]);
         constructor.push_annotation(AnnotationSpec::new(json_creator_type));
-        constructor.push_argument(&values_argument);
+        constructor.push_argument(values_argument.clone());
         constructor.push(stmt!["this.values = ", values_argument, ";"]);
 
         let mut values_getter = MethodSpec::new(mods![Modifier::Public], "getValues");
