@@ -3,6 +3,8 @@
 [![Build Status](https://travis-ci.org/udoprog/codeviz.svg?branch=master)](https://travis-ci.org/udoprog/codeviz)
 [![crates.io](https://img.shields.io/crates/v/codeviz.svg?maxAge=2592000)](https://crates.io/crates/codeviz)
 
+**Note:** This project has been deprecated by [genco](https://github.com/udoprog/genco).
+
 codeviz is a simple code generator for rust, specifically written for use in [reproto][reproto].
 
 This project is inspired by JavaPoet (https://github.com/square/javapoet)
